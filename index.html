@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Flowfield — Generative Wallpaper Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{background:#08080c;color:#e4e4e7;font-family:Inter,system-ui,sans-serif}
+.f-d{font-family:'Space Grotesk',Inter,sans-serif}.f-m{font-family:'JetBrains Mono',ui-monospace,monospace}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:99px;outline:0;background:linear-gradient(90deg,#d4ff4f var(--fill,50%),rgba(255,255,255,.12) var(--fill,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #08080c;cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #08080c;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:500;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#e4e4e7;transition:.15s;cursor:pointer}
+.btn:hover{background:rgba(255,255,255,.14)}
+.lime{background:#d4ff4f;color:#0a0a0a;border-color:#d4ff4f;font-weight:600}.lime:hover{background:#e3ff8a}
+.ic{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card{background:rgba(13,13,18,.9);border:1px solid rgba(255,255,255,.1);border-radius:16px}
+.sel{outline:2px solid #d4ff4f;outline-offset:1px}
+@keyframes mq{to{transform:translateX(-50%)}}.mq{animation:mq 50s linear infinite;width:max-content}
+.hs{scrollbar-width:thin}
+</style></head>
+<body>
+<div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+ <div class="absolute left-1/2 -top-40 -translate-x-1/2 w-[720px] h-[420px] bg-violet-600/20 blur-[140px] max-w-full"></div>
+ <div class="absolute -left-24 top-1/3 w-[380px] h-[380px] bg-cyan-500/10 blur-[120px]"></div>
+ <div class="absolute -right-24 bottom-0 w-[420px] h-[380px] bg-lime-400/[0.07] blur-[120px]"></div>
+ <div class="absolute inset-0" style="background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse at top,#000,transparent 70%);mask-image:radial-gradient(ellipse at top,#000,transparent 70%)"></div>
+</div>
+
+<header class="sticky top-0 z-40 border-b border-white/10 bg-[#08080c]/70 backdrop-blur-xl">
+ <div class="max-w-[1400px] mx-auto px-4 h-16 flex items-center justify-between gap-3">
+  <div class="flex items-center gap-2.5">
+   <div class="w-9 h-9 rounded-xl bg-lime-300 text-black grid place-items-center"><svg class="ic" viewBox="0 0 24 24" style="stroke-width:2.4"><path d="M2 8c3-3 5 3 10 0s7 3 10 0M2 16c3-3 5 3 10 0s7 3 10 0"/></svg></div>
+   <div class="leading-tight"><div class="f-d font-bold text-white text-lg">Flowfield</div><div class="text-[9px] tracking-[.2em] text-zinc-500 hidden sm:block">WALLPAPER GENERATOR</div></div>
+   <span class="hidden md:inline text-[10px] f-m px-2 py-0.5 rounded-full border border-lime-300/30 text-lime-200 bg-lime-300/10">Studio v2</span>
+  </div>
+  <nav class="hidden md:flex gap-6 text-sm text-zinc-400"><a class="hover:text-white" href="#studio">Studio</a><a class="hover:text-white" href="#palettes">Palettes</a><a class="hover:text-white" href="#guide">Field guide</a></nav>
+  <div class="flex items-center gap-2">
+   <button id="hSeed" class="btn f-m hidden sm:inline-flex"></button>
+   <button id="hSurp" class="btn"></button>
+   <button id="hExp" class="btn lime"></button>
+  </div>
+ </div>
+</header>
+
+<main class="max-w-[1400px] mx-auto px-4">
+ <section class="text-center pt-12 pb-8">
+  <div class="inline-block text-xs text-zinc-400 border border-white/10 bg-white/5 rounded-full px-4 py-1.5 mb-5">Perlin-noise flow fields · deterministic seeds · 4K PNG &amp; SVG export</div>
+  <h1 class="f-d font-bold text-5xl sm:text-7xl text-white tracking-tight">Grow silk <span class="text-zinc-500">from</span> <span class="bg-gradient-to-r from-lime-300 via-cyan-300 to-violet-400 bg-clip-text text-transparent">noise.</span></h1>
+  <div class="mt-6 flex flex-wrap justify-center gap-2 text-xs f-m text-zinc-400"><span class="border border-white/10 rounded-full px-3 py-1">Space = play / pause</span><span class="border border-white/10 rounded-full px-3 py-1">R = random · D = download · S = SVG</span></div>
+ </section>
+
+ <section id="studio" class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_370px] items-start">
+  <div class="space-y-6 min-w-0">
+   <div id="stage" class="relative aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden border border-white/10 bg-black">
+    <canvas id="cv" width="1280" height="720" class="absolute inset-0 w-full h-full object-cover"></canvas>
+    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-30" style="mix-blend-mode:overlay"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+    <div class="absolute top-3 left-3 right-3 flex flex-wrap gap-2 text-[11px] f-m">
+     <span id="hStat" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1 flex items-center gap-2"></span>
+     <span id="hSeedPill" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1"></span>
+     <span id="hPart" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1"></span>
+    </div>
+    <div class="absolute bottom-3 left-3 right-3 rounded-xl bg-black/55 backdrop-blur-xl border border-white/10 p-2.5">
+     <div class="h-1 rounded-full bg-white/10 mb-2.5 overflow-hidden"><div id="bar" class="h-full bg-gradient-to-r from-lime-300 via-cyan-300 to-violet-400" style="width:0"></div></div>
+     <div id="hud" class="flex flex-wrap items-center gap-1.5"></div>
+    </div>
+   </div>
+
+   <div id="palettes">
+    <h2 class="f-d font-semibold text-white mb-3">Quick palettes</h2>
+    <div id="strip" class="flex gap-3 overflow-x-auto pb-2 hs"></div>
+   </div>
+
+   <div>
+    <div class="flex items-baseline justify-between mb-3"><h2 class="f-d font-semibold text-white">Session gallery</h2><span class="text-xs text-zinc-500">Up to 8 frames · click to restore</span></div>
+    <div id="gal" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+   </div>
+  </div>
+
+  <aside class="lg:sticky lg:top-20 space-y-4">
+   <div id="side" class="card p-4 space-y-5 lg:max-h-[calc(100vh-110px)] overflow-y-auto hs"></div>
+   <div class="rounded-2xl p-4 border border-lime-300/20 bg-lime-300/5 text-sm text-zinc-300"><div class="f-d font-semibold text-lime-200 mb-1">Pro recipe</div>Try <b>Porcelain</b>, complexity 2.5, turbulence 2.0, 4,000 particles, 0.7 width and 0.35 opacity. Export as SVG and plot it on paper.</div>
+  </aside>
+ </section>
+
+ <section id="guide" class="py-16">
+  <h2 class="f-d font-bold text-3xl text-white mb-6">Field guide</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+   <div class="card p-5"><div class="f-m text-lime-300 text-xs mb-2">01</div><h3 class="f-d font-semibold text-white mb-1">Wind from noise</h3><p class="text-sm text-zinc-400">Layered Perlin noise assigns every point an angle. Complexity zooms the field, turbulence scales how hard it turns.</p></div>
+   <div class="card p-5"><div class="f-m text-lime-300 text-xs mb-2">02</div><h3 class="f-d font-semibold text-white mb-1">Particles leave ink</h3><p class="text-sm text-zinc-400">Thousands of particles ride the wind and leave translucent strokes. Overdraw keeps painting on the same canvas.</p></div>
+   <div class="card p-5"><div class="f-m text-lime-300 text-xs mb-2">03</div><h3 class="f-d font-semibold text-white mb-1">Seeds freeze chance</h3><p class="text-sm text-zinc-400">The same seed and settings always regrow the same piece, at any resolution, as pixels or true vector paths.</p></div>
+  </div>
+ </section>
+</main>
+<div class="overflow-hidden border-y border-white/10 py-4"><div id="mq" class="mq flex gap-3"></div></div>
+<footer class="text-center text-xs text-zinc-500 py-8">Flowfield Studio v2 · Deterministic Perlin flow fields · PNG &amp; SVG</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const IC={wave:'<path d="M2 8c3-3 5 3 10 0s7 3 10 0M2 16c3-3 5 3 10 0s7 3 10 0"/>',play:'<polygon points="6 3 20 12 6 21 6 3"/>',pause:'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',replay:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',shuffle:'<path d="m18 14 4 4-4 4M18 2l4 4-4 4M2 18h1.97a4 4 0 0 0 3.2-1.6l9.66-12.8A4 4 0 0 1 20 2h2M2 6h1.97a4 4 0 0 1 3.2 1.6l.8 1.1M22 18h-2a4 4 0 0 1-3.2-1.6l-.8-1.1"/>',layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',save:'<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',max:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',dice:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1"/><circle cx="15.5" cy="15.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/><circle cx="8.5" cy="15.5" r="1"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',check:'<path d="M20 6 9 17l-5-5"/>',spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>'};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24">${IC[n]}</svg>`;
+
+/* ---------- engine ---------- */
+function mulberry32(a){a>>>=0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function makePerlin(seed){const r=mulberry32(seed),p=[...Array(256).keys()];
+ for(let i=255;i>0;i--){const j=Math.floor(r()*(i+1));[p[i],p[j]]=[p[j],p[i]]}
+ const P=new Uint8Array(512);for(let i=0;i<512;i++)P[i]=p[i&255];
+ const G=[[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];
+ const fade=t=>t*t*t*(t*(t*6-15)+10),lerp=(a,b,t)=>a+t*(b-a);
+ const grad=(h,x,y)=>{const g=G[h&7];return g[0]*x+g[1]*y};
+ function noise(x,y){const X=Math.floor(x)&255,Y=Math.floor(y)&255;x-=Math.floor(x);y-=Math.floor(y);
+  const u=fade(x),v=fade(y),A=P[X]+Y,B=P[X+1]+Y;
+  return lerp(lerp(grad(P[A],x,y),grad(P[B],x-1,y),u),lerp(grad(P[A+1],x,y-1),grad(P[B+1],x-1,y-1),u),v)}
+ function fbm(x,y,o=3,lac=2,gain=.5){let s=0,a=1,f=1,n=0;for(let i=0;i<o;i++){s+=a*noise(x*f,y*f);n+=a;a*=gain;f*=lac}return s/n}
+ return{noise,fbm}}
+
+const PAL=[
+["aurora","Aurora","Polar lights","#060d14",["#7df9ff","#4ade80","#a78bfa","#f0fdf4","#22d3ee"]],
+["ember","Ember Drift","Volcanic silk","#140806",["#ff5c28","#ffb347","#ff2e63","#ffe8c2","#b91c1c"]],
+["deep","Deep Current","Ocean trench","#040d1a",["#0ea5e9","#22d3ee","#818cf8","#e0f2fe","#0c4a6e"]],
+["uv","Ultraviolet","Club haze","#0c0616",["#c084fc","#f472b6","#60a5fa","#f5f3ff","#7c3aed"]],
+["botanic","Botanic","Moss & fern","#0a120b",["#a3e635","#34d399","#fef9c3","#65a30d","#2dd4bf"]],
+["solar","Solar Wind","Desert noon","#150f06",["#fbbf24","#fb7185","#f97316","#fef3c7","#fde68a"]],
+["porcelain","Porcelain","Ink on paper","#f4f1ea",["#1c1917","#44403c","#0ea5e9","#b45309","#78716c"]],
+["glacier","Glacier","Arctic minimal","#eef6fb",["#0c4a6e","#0284c7","#67e8f9","#94a3b8","#164e63"]],
+["bloom","Midnight Bloom","Neon garden","#0d0714",["#f0abfc","#fb7185","#facc15","#a78bfa","#fdf4ff"]],
+["matcha","Matcha Paper","Soft daylight","#f2f0e6",["#3f6212","#65a30d","#0f766e","#a16207","#1c1917"]],
+["magma","Magma & Ice","High contrast","#08080c",["#f97316","#38bdf8","#f8fafc","#ef4444","#a5b4fc"]],
+["candy","Candy Static","Playful pop","#160a18",["#f9a8d4","#67e8f9","#fde047","#c4b5fd","#ffffff"]]
+].map(a=>({id:a[0],name:a[1],mood:a[2],bg:a[3],colors:a[4]}));
+
+const RES={preview:["Canvas fit",0,0,"Exactly what you see"],hd:["Desktop HD",1920,1080],qhd:["Desktop QHD",2560,1440],"4k":["4K UHD",3840,2160],ultrawide:["Ultrawide",3440,1440],phone:["Phone",1170,2532],square:["Square",2048,2048]};
+
+function makeSim(W,H,p,pal,bg){
+ const sc=Math.max(W,H)/1600,per=makePerlin(p.seed),rng=mulberry32((p.seed^2654435769)>>>0),n=pal.colors.length;
+ const ps=[];
+ function spawn(q){q.x=rng()*W;q.y=rng()*H;q.age=0;q.life=Math.max(10,Math.round(p.maxLife*(.5+.5*rng())));
+  const v=(per.fbm((q.x/W)*2.2+p.seed*1e-4,(q.y/H)*2.2,2)*.5+.5)*p.colorSpread+rng()*(1-p.colorSpread);
+  q.c=Math.abs(Math.floor(v*n*1.15))%n;
+  q.w=Math.max(.1,Math.round(p.lineWidth*sc*(1-p.lineVariation*rng()*.7)*10)/10);q.pts=[[q.x,q.y]];return q}
+ for(let i=0;i<p.particleCount;i++)ps.push(spawn({}));
+ return{W,H,sc,pal,bg,p,step(seg,end){const sp=p.speed*sc;
+  for(const q of ps){const a=per.fbm((q.x/W)*p.frequency+p.seed*13e-6,(q.y/H)*p.frequency,p.octaves)*Math.PI*p.curl+p.rotation;
+   const ox=q.x,oy=q.y;q.x+=Math.cos(a)*sp;q.y+=Math.sin(a)*sp;q.age++;
+   if(seg)seg(q.c,q.w,ox,oy,q.x,q.y);
+   if(end)q.pts.push([q.x,q.y]);
+   if(q.age>=q.life||q.x<-20||q.y<-20||q.x>W+20||q.y>H+20){if(end)end(q);spawn(q)}}},
+  flush(end){for(const q of ps)end(q)}}}
+function drawTick(sim,ctx){const m=new Map();
+ sim.step((c,w,ox,oy,nx,ny)=>{const k=c+'|'+w;let p=m.get(k);if(!p){p=new Path2D();m.set(k,p)}p.moveTo(ox,oy);p.lineTo(nx,ny)});
+ ctx.globalAlpha=sim.p.opacity;ctx.lineCap='round';
+ for(const[k,p]of m){const[c,w]=k.split('|');ctx.strokeStyle=sim.pal.colors[+c];ctx.lineWidth=+w;ctx.stroke(p)}}
+
+/* ---------- state ---------- */
+const DEF={seed:48211,particleCount:2600,maxLife:140,frequency:4.2,curl:3.4,octaves:3,rotation:0,lineWidth:1.1,opacity:.55,speed:1.6,lineVariation:.6,colorSpread:.85};
+const S={...DEF,pal:0,bgOv:null,fmt:'png',res:'hd'};
+const SL=[
+["Composition",[["particleCount","Particles",400,7000,100,0],["maxLife","Trail length",20,320,5,0],["speed","Speed",.4,4,.1,1,"×"]]],
+["Wind field",[["frequency","Complexity",1.5,12,.1,1],["curl","Turbulence",.5,8,.1,1,"π"],["octaves","Detail octaves",1,5,1,0],["rotation","Swirl rotation",0,6.28,.05,2]]],
+["Ink",[["lineWidth","Line width",.4,3,.1,1,"px"],["opacity","Opacity",.05,1,.05,2],["lineVariation","Width jitter",0,1,.05,2],["colorSpread","Color mixing",0,1,.05,2]]]];
+const cv=$('#cv'),ctx=cv.getContext('2d');
+let sim=null,stepsDone=0,target=0,playing=true,gallery=[],timer=null,busy=false;
+const pal=()=>PAL[S.pal],bgc=()=>S.bgOv||pal().bg;
+
+function restart(play=true){
+ sim=makeSim(cv.width,cv.height,S,pal(),bgc());ctx.globalAlpha=1;ctx.fillStyle=bgc();ctx.fillRect(0,0,cv.width,cv.height);
+ stepsDone=0;target=S.particleCount*S.maxLife;if(play)playing=true;hud()}
+const debounced=()=>{clearTimeout(timer);timer=setTimeout(()=>restart(),150)};
+function overdraw(){target+=S.particleCount*S.maxLife*.7;playing=true;hud()}
+const done=()=>stepsDone>=target;
+function loop(){if(playing&&!done()){for(let i=0;i<2&&!done();i++){drawTick(sim,ctx);stepsDone+=S.particleCount}if(done())hud();else prog()}requestAnimationFrame(loop)}
+const pct=()=>Math.min(100,Math.round(stepsDone/(S.particleCount*S.maxLife)*100));
+function prog(){$('#bar').style.width=pct()+'%';$('#hPart').textContent=`${S.particleCount.toLocaleString()} particles · ${pct()}%`}
+
+/* ---------- export ---------- */
+const dims=()=>S.res==='preview'?[cv.width,cv.height]:[RES[S.res][1],RES[S.res][2]];
+async function save(blob,name){let d=null;try{d=await window.claude?.use('downloads')}catch(e){}
+ if(d){try{await d.save({filename:name,data:blob});return 1}catch(e){if(e&&e.code==='declined')return 0;toast('Save unavailable: '+(e&&e.code||'error'));return 0}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);return 1}
+function toast(t){let e=$('#toast');if(!e){e=document.createElement('div');e.id='toast';e.className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 f-m text-xs bg-lime-300 text-black rounded-full px-4 py-2';document.body.appendChild(e)}e.textContent=t;e.style.display=t?'block':'none'}
+const tick0=()=>new Promise(r=>setTimeout(r));
+async function exportAs(fmt){if(busy)return;busy=true;toast('Rendering '+fmt.toUpperCase()+'…');
+ try{const[W,H]=dims(),ex=new makeSim(W,H,S,pal(),bgc()),name=`flowfield-${S.seed}-${S.res}.${fmt}`;
+  if(fmt==='png'){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle=bgc();x.fillRect(0,0,W,H);
+   for(let t=0;t<S.maxLife;t++){drawTick(ex,x);if(t%8==7)await tick0()}
+   const b=await new Promise(r=>c.toBlob(r,'image/png'));toast('Ready — confirm the save');await save(b,name)}
+  else{const g=new Map(),inb=p=>p[0]>=0&&p[0]<=W&&p[1]>=0&&p[1]<=H,cl=p=>[Math.min(W,Math.max(0,p[0])),Math.min(H,Math.max(0,p[1]))],
+   f=q=>{const P=q.pts,runs=[];let r=[];
+    for(let i=0;i<P.length;i++){const p=P[i];if(inb(p)){if(!r.length&&i>0)r.push(cl(P[i-1]));r.push(p)}else if(r.length){r.push(cl(p));runs.push(r);r=[]}}
+    if(r.length)runs.push(r);
+    for(const u of runs)if(u.length>1){const k=q.c+'|'+q.w;g.set(k,(g.get(k)||'')+'M'+u.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L'))}
+    q.pts=[[q.x,q.y]]};
+   for(let t=0;t<S.maxLife;t++){ex.step(null,q=>f(q));if(t%8==7)await tick0()}
+   ex.flush(f);
+   let paths='';for(const[k,d]of g){const[c,w]=k.split('|');paths+=`<path stroke="${pal().colors[+c]}" stroke-width="${w}" d="${d}"/>`}
+   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" overflow="hidden"><defs><clipPath id="ab"><rect width="${W}" height="${H}"/></clipPath></defs><rect width="100%" height="100%" fill="${bgc()}"/><g clip-path="url(#ab)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="${S.opacity}">${paths}</g></svg>`;
+   toast('Ready — confirm the save');await save(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),name)}
+  toast('');}catch(e){toast('Export failed')}
+ busy=false;setTimeout(()=>toast(''),2500)}
+
+/* ---------- UI ---------- */
+function snap(){const c=document.createElement('canvas');c.width=240;c.height=135;c.getContext('2d').drawImage(cv,0,0,240,135);
+ gallery.unshift({seed:S.seed,pal:S.pal,url:c.toDataURL('image/jpeg',.8)});gallery=gallery.slice(0,8);renderGal()}
+function renderGal(){const g=$('#gal');if(!gallery.length){g.innerHTML='<div class="col-span-full text-sm text-zinc-500 border border-dashed border-white/10 rounded-xl p-6 text-center">Shuffle or save a frame to start your gallery.</div>';return}
+ g.innerHTML=gallery.map((x,i)=>`<button data-i="${i}" class="gi rounded-xl overflow-hidden border border-white/10 text-left bg-[#0e0e13] hover:border-lime-300/50"><img src="${x.url}" class="w-full aspect-video object-cover"><div class="px-2 py-1.5 text-[11px] f-m text-zinc-400 flex justify-between"><span>#${x.seed}</span><span>${PAL[x.pal].name}</span></div></button>`).join('');
+ g.querySelectorAll('.gi').forEach(b=>b.onclick=()=>{const x=gallery[+b.dataset.i];S.seed=x.seed;S.pal=x.pal;S.bgOv=null;sync();restart()})}
+const rnd=(a,b,s)=>Math.round((a+Math.random()*(b-a))/s)*s;
+function surprise(){snap();S.pal=Math.floor(Math.random()*PAL.length);S.bgOv=null;S.seed=Math.floor(Math.random()*99999);
+ for(const[,l]of SL)for(const[k,,mn,mx,st]of l){if(k==='particleCount')S[k]=rnd(1500,4500,st);else if(k==='maxLife')S[k]=rnd(80,200,st);else S[k]=+rnd(mn,mx,st).toFixed(2)}
+ S.lineWidth=+rnd(.6,1.8,.1).toFixed(1);S.opacity=+rnd(.3,.8,.05).toFixed(2);sync();restart()}
+function randSeed(){S.seed=Math.floor(Math.random()*99999);sync();restart()}
+function fs(){document.fullscreenElement?document.exitFullscreen():$('#stage').requestFullscreen?.()}
+const exp=()=>exportAs(S.fmt);
+
+function hud(){
+ const st=done()?['COMPLETE','bg-cyan-300',0]:playing?['GROWING','bg-lime-300','animate-pulse']:['PAUSED','bg-zinc-400',0];
+ $('#hStat').innerHTML=`<span class="w-2 h-2 rounded-full ${st[1]} ${st[2]}"></span>${st[0]}`;
+ $('#hSeedPill').textContent='seed #'+S.seed;$('#hSeed').innerHTML=ic('copy')+'#'+S.seed;
+ $('#hSurp').innerHTML=ic('spark')+'<span class="hidden sm:inline">Surprise me</span>';
+ $('#hExp').innerHTML=ic('dl')+'Export '+S.fmt.toUpperCase();
+ const B=(id,i,t,c='')=>`<button id="${id}" class="btn ${c}" title="${t}">${ic(i)}${c?'':''}</button>`;
+ $('#hud').innerHTML=`<button id="bPlay" class="btn lime">${ic(playing&&!done()?'pause':'play')}</button><button id="bRe" class="btn" title="Replay from seed">${ic('replay')}</button><button id="bSh" class="btn">${ic('shuffle')}Shuffle</button><button id="bOv" class="btn">${ic('layers')}Overdraw</button><button id="bSv" class="btn" title="Save to gallery">${ic('save')}</button><button id="bFs" class="btn" title="Fullscreen">${ic('max')}</button><span class="flex-1"></span><button id="bPng" class="btn">${ic('dl')}PNG</button><button id="bSvg" class="btn">${ic('dl')}SVG</button>`;
+ $('#bPlay').onclick=toggle;$('#bRe').onclick=()=>restart();$('#bSh').onclick=surprise;$('#bOv').onclick=overdraw;$('#bSv').onclick=snap;$('#bFs').onclick=fs;$('#bPng').onclick=()=>exportAs('png');$('#bSvg').onclick=()=>exportAs('svg');
+ prog()}
+function toggle(){if(done())overdraw();else{playing=!playing;hud()}}
+
+function side(){
+ const sw=['#08080c','#0f172a','#1c1917','#f4f1ea','#ffffff'];
+ let h=`<div><div class="f-d font-semibold text-white mb-2">Palette</div><div id="pg" class="grid grid-cols-6 gap-1.5 mb-3">${PAL.map((p,i)=>`<button data-i="${i}" title="${p.name}" class="pb h-9 rounded-lg overflow-hidden border border-white/10 flex flex-col" style="background:${p.bg}"><span class="flex-1 flex w-full">${p.colors.map(c=>`<i class="flex-1" style="background:${c}"></i>`).join('')}</span></button>`).join('')}</div>
+ <div id="ps" class="rounded-xl p-3 border border-white/10 bg-[#0e0e13] text-sm"></div>
+ <div class="mt-3 text-xs text-zinc-400">Canvas background</div><div class="flex items-center gap-1.5 mt-1.5">${sw.map(c=>`<button data-c="${c}" class="bgb w-6 h-6 rounded-full border border-white/20" style="background:${c}"></button>`).join('')}<input id="bgc" type="color" class="w-7 h-7 bg-transparent border-0 p-0 cursor-pointer"><button id="bgr" class="btn" style="padding:3px 8px">Reset</button></div></div>`;
+ for(const[t,l]of SL)h+=`<div><div class="f-d font-semibold text-white mb-2">${t}</div><div class="space-y-3">${l.map(([k,lb,mn,mx,st,d,u=''])=>`<div><div class="flex justify-between text-xs mb-1.5"><span class="text-zinc-400">${lb}</span><span id="v_${k}" class="f-m text-lime-200"></span></div><input type="range" data-k="${k}" min="${mn}" max="${mx}" step="${st}"></div>`).join('')}</div></div>`;
+ h+=`<div><div class="f-d font-semibold text-white mb-2">Seed</div><div class="flex gap-2"><input id="sd" type="number" class="f-m flex-1 min-w-0 rounded-lg bg-[#0e0e13] border border-white/10 px-3 py-1.5 text-sm text-white"><button id="sg" class="btn lime">Grow</button><button id="sr" class="btn" title="Randomize seed">${ic('dice')}</button></div></div>
+ <div><div class="f-d font-semibold text-white mb-2">Export (PNG · SVG)</div><div class="grid grid-cols-2 gap-2 mb-3">${[['png','PNG format','Crisp 4K raster'],['svg','SVG format','Infinite vector paths']].map(([k,a,b])=>`<button data-f="${k}" class="fb text-left rounded-xl border border-white/10 bg-[#0e0e13] p-2.5"><div class="text-sm text-white">${a}</div><div class="text-[11px] text-zinc-500">${b}</div></button>`).join('')}</div>
+ <div class="grid grid-cols-2 gap-2 mb-3">${Object.entries(RES).map(([k,r])=>`<button data-r="${k}" class="rb text-left rounded-lg border border-white/10 bg-[#0e0e13] p-2"><div class="text-xs text-white">${r[0]}</div><div class="f-m text-[10px] text-zinc-500">${r[1]?r[1]+' × '+r[2]:r[3]}</div></button>`).join('')}</div>
+ <button id="dl" class="btn lime w-full justify-center py-2.5"></button><div class="grid grid-cols-2 gap-2 mt-2"><button id="qp" class="btn justify-center">Quick PNG</button><button id="qs" class="btn justify-center">Quick SVG</button></div></div>`;
+ $('#side').innerHTML=h;
+ $('#pg').onclick=e=>{const b=e.target.closest('.pb');if(b){S.pal=+b.dataset.i;S.bgOv=null;sync();restart()}};
+ document.querySelectorAll('.bgb').forEach(b=>b.onclick=()=>{S.bgOv=b.dataset.c;sync();restart()});
+ $('#bgc').oninput=e=>{S.bgOv=e.target.value;sync();debounced()};$('#bgr').onclick=()=>{S.bgOv=null;sync();restart()};
+ document.querySelectorAll('input[data-k]').forEach(el=>el.oninput=()=>{S[el.dataset.k]=+el.value;sync(true);debounced()});
+ $('#sd').onchange=e=>{S.seed=Math.abs(parseInt(e.target.value)||0);sync();restart()};$('#sg').onclick=()=>{S.seed=Math.abs(parseInt($('#sd').value)||0);sync();restart()};$('#sr').onclick=randSeed;
+ document.querySelectorAll('.fb').forEach(b=>b.onclick=()=>{S.fmt=b.dataset.f;sync()});
+ document.querySelectorAll('.rb').forEach(b=>b.onclick=()=>{S.res=b.dataset.r;sync()});
+ $('#dl').onclick=exp;$('#qp').onclick=()=>exportAs('png');$('#qs').onclick=()=>exportAs('svg')}
+
+function sync(light){
+ document.querySelectorAll('input[data-k]').forEach(el=>{const k=el.dataset.k,v=S[k];el.value=v;el.style.setProperty('--fill',((v-el.min)/(el.max-el.min)*100)+'%');
+  const cfg=SL.flatMap(x=>x[1]).find(c=>c[0]===k);$('#v_'+k).textContent=(+v).toFixed(cfg[5])+(cfg[6]||'')});
+ hud();if(light)return;
+ const p=pal();document.querySelectorAll('.pb').forEach(b=>b.classList.toggle('sel',+b.dataset.i===S.pal));
+ $('#ps').innerHTML=`<div class="flex justify-between"><span class="text-white">${p.name}</span><span class="text-xs text-zinc-500">${p.mood}</span></div><div class="flex gap-1 mt-2">${p.colors.map(c=>`<i class="flex-1 h-3 rounded" style="background:${c}"></i>`).join('')}</div>`;
+ document.querySelectorAll('.bgb').forEach(b=>b.classList.toggle('sel',b.dataset.c===S.bgOv));
+ $('#sd').value=S.seed;
+ document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.f===S.fmt));
+ document.querySelectorAll('.rb').forEach(b=>b.classList.toggle('sel',b.dataset.r===S.res));
+ $('#dl').innerHTML=ic('dl')+'Download '+S.fmt.toUpperCase()+' wallpaper';
+ $('#strip').querySelectorAll('.sc').forEach(b=>b.classList.toggle('sel',+b.dataset.i===S.pal))}
+
+$('#strip').innerHTML=PAL.map((p,i)=>`<button data-i="${i}" class="sc shrink-0 w-40 rounded-xl overflow-hidden border border-white/10 text-left" style="background:${p.bg}"><div class="flex h-14 gap-1 p-2.5">${p.colors.map(c=>`<i class="flex-1 rounded-sm" style="background:${c}"></i>`).join('')}</div><div class="bg-[#0e0e13] px-3 py-2"><div class="text-sm text-white">${p.name}</div><div class="text-[11px] text-zinc-500">${p.mood}</div></div></button>`).join('');
+$('#strip').onclick=e=>{const b=e.target.closest('.sc');if(b){S.pal=+b.dataset.i;S.bgOv=null;sync();restart()}};
+const pills=PAL.map(p=>`<span class="flex items-center gap-2 border border-white/10 rounded-full px-4 py-2 text-sm text-zinc-300 whitespace-nowrap bg-white/5">${p.colors.slice(0,3).map(c=>`<i class="w-2.5 h-2.5 rounded-full" style="background:${c}"></i>`).join('')}${p.name}</span>`).join('');
+$('#mq').innerHTML=pills+pills;
+$('#hSeed').onclick=async()=>{try{await navigator.clipboard.writeText(String(S.seed))}catch(e){}$('#hSeed').innerHTML=ic('check')+'Copied';setTimeout(hud,1200)};
+$('#hSurp').onclick=surprise;$('#hExp').onclick=exp;
+addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName)&&e.target.type!=='range')return;if(e.metaKey||e.ctrlKey)return;
+ const k=e.key.toLowerCase();if(e.code==='Space'){e.preventDefault();toggle()}else if(k==='r')surprise();else if(k==='d')exp();else if(k==='s')exportAs('svg')});
+side();renderGal();sync();restart();loop();
+</script></body></html>
