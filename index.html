@@ -14,12 +14,28 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #08080c;cursor:pointer}
 .btn{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:500;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#e4e4e7;transition:.15s;cursor:pointer}
 .btn:hover{background:rgba(255,255,255,.14)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
 .lime{background:#d4ff4f;color:#0a0a0a;border-color:#d4ff4f;font-weight:600}.lime:hover{background:#e3ff8a}
 .ic{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .card{background:rgba(13,13,18,.9);border:1px solid rgba(255,255,255,.1);border-radius:16px}
 .sel{outline:2px solid #d4ff4f;outline-offset:1px}
 @keyframes mq{to{transform:translateX(-50%)}}.mq{animation:mq 50s linear infinite;width:max-content}
 .hs{scrollbar-width:thin}
+.tog{text-align:center;font-size:11px;line-height:1.25;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#a1a1aa;cursor:pointer;transition:.15s}
+.tog:hover{background:rgba(255,255,255,.11);color:#e4e4e7}
+.tog.on{background:rgba(212,255,79,.13);border-color:rgba(212,255,79,.45);color:#eaffb0}
+.tog .t{display:flex;align-items:center;gap:5px;justify-content:center}
+.mini{font-size:10px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#a1a1aa;cursor:pointer}
+.mini:hover{color:#fff;background:rgba(255,255,255,.13)}
+.mini.on{background:rgba(212,255,79,.15);border-color:rgba(212,255,79,.45);color:#eaffb0}
+.sbtn{display:flex;align-items:flex-start;gap:8px;text-align:left;padding:8px;border-radius:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:#d4d4d8;cursor:pointer;transition:.15s}
+.sbtn:hover{background:rgba(255,255,255,.1)}
+.sbtn.act{border-color:#d4ff4f;box-shadow:0 0 0 1px #d4ff4f inset;color:#fff}
+.sbtn .ic{width:16px;height:16px;margin-top:1px;flex:0 0 auto}
+.badge{font-size:9px;letter-spacing:.08em;padding:1px 5px;border-radius:99px;border:1px solid rgba(255,255,255,.14);color:#a1a1aa}
+select,input[type=text],input[type=number]{background:#0e0e13;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#e4e4e7}
+.tile{transition:.15s}.tile:hover{border-color:rgba(212,255,79,.45)}
+.spin{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 </style></head>
 <body>
 <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
@@ -36,9 +52,10 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
    <div class="leading-tight"><div class="f-d font-bold text-white text-lg">Flowfield</div><div class="text-[9px] tracking-[.2em] text-zinc-500 hidden sm:block">WALLPAPER GENERATOR</div></div>
    <span class="hidden md:inline text-[10px] f-m px-2 py-0.5 rounded-full border border-lime-300/30 text-lime-200 bg-lime-300/10">Studio v2</span>
   </div>
-  <nav class="hidden md:flex gap-6 text-sm text-zinc-400"><a class="hover:text-white" href="#studio">Studio</a><a class="hover:text-white" href="#palettes">Palettes</a><a class="hover:text-white" href="#guide">Field guide</a></nav>
+  <nav class="hidden md:flex gap-6 text-sm text-zinc-400"><a class="hover:text-white" href="#studio">Studio</a><a class="hover:text-white" href="#palettes">Palettes</a><a class="hover:text-white" href="#batch">Batch</a><a class="hover:text-white" href="#guide">Field guide</a></nav>
   <div class="flex items-center gap-2">
    <button id="hSeed" class="btn f-m hidden sm:inline-flex"></button>
+   <button id="hBatch" class="btn hidden sm:inline-flex"></button>
    <button id="hSurp" class="btn"></button>
    <button id="hExp" class="btn lime"></button>
   </div>
@@ -47,9 +64,9 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
 
 <main class="max-w-[1400px] mx-auto px-4">
  <section class="text-center pt-12 pb-8">
-  <div class="inline-block text-xs text-zinc-400 border border-white/10 bg-white/5 rounded-full px-4 py-1.5 mb-5">Perlin-noise flow fields · deterministic seeds · 4K PNG &amp; SVG export</div>
+  <div class="inline-block text-xs text-zinc-400 border border-white/10 bg-white/5 rounded-full px-4 py-1.5 mb-5">Perlin-noise flow fields · style types incl. <span class="text-cyan-300">Technology</span> · 4K PNG, SVG &amp; bulk ZIP export</div>
   <h1 class="f-d font-bold text-5xl sm:text-7xl text-white tracking-tight">Grow silk <span class="text-zinc-500">from</span> <span class="bg-gradient-to-r from-lime-300 via-cyan-300 to-violet-400 bg-clip-text text-transparent">noise.</span></h1>
-  <div class="mt-6 flex flex-wrap justify-center gap-2 text-xs f-m text-zinc-400"><span class="border border-white/10 rounded-full px-3 py-1">Space = play / pause</span><span class="border border-white/10 rounded-full px-3 py-1">R = random · D = download · S = SVG</span></div>
+  <div class="mt-6 flex flex-wrap justify-center gap-2 text-xs f-m text-zinc-400"><span class="border border-white/10 rounded-full px-3 py-1">Space = play / pause</span><span class="border border-white/10 rounded-full px-3 py-1">R = random · D = download · S = SVG</span><span class="border border-white/10 rounded-full px-3 py-1">N = next style · B = batch</span></div>
  </section>
 
  <section id="studio" class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_370px] items-start">
@@ -59,6 +76,7 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
     <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-30" style="mix-blend-mode:overlay"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
     <div class="absolute top-3 left-3 right-3 flex flex-wrap gap-2 text-[11px] f-m">
      <span id="hStat" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1 flex items-center gap-2"></span>
+     <span id="hStyle" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1"></span>
      <span id="hSeedPill" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1"></span>
      <span id="hPart" class="rounded-full bg-black/50 backdrop-blur border border-white/10 px-3 py-1"></span>
     </div>
@@ -81,28 +99,123 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
 
   <aside class="lg:sticky lg:top-20 space-y-4">
    <div id="side" class="card p-4 space-y-5 lg:max-h-[calc(100vh-110px)] overflow-y-auto hs"></div>
-   <div class="rounded-2xl p-4 border border-lime-300/20 bg-lime-300/5 text-sm text-zinc-300"><div class="f-d font-semibold text-lime-200 mb-1">Pro recipe</div>Try <b>Porcelain</b>, complexity 2.5, turbulence 2.0, 4,000 particles, 0.7 width and 0.35 opacity. Export as SVG and plot it on paper.</div>
+   <div class="rounded-2xl p-4 border border-cyan-300/20 bg-cyan-300/5 text-sm text-zinc-300"><div class="f-d font-semibold text-cyan-200 mb-1">Technology types</div>Circuit Trace, Neural Net, Data Stream, Glitch Scan and Blueprint quantise the field into 45° runs, vias and packet dashes — pick the <b>Technology</b> type in the style panel, then push a whole run through the <a class="text-cyan-200 underline decoration-dotted" href="#batch">Batch studio</a>.</div>
   </aside>
+ </section>
+
+ <section id="batch" class="pt-10">
+  <div class="card p-4 sm:p-5 space-y-5">
+   <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+     <h2 class="f-d font-bold text-2xl text-white">Batch studio</h2>
+     <p class="text-sm text-zinc-400 mt-0.5 max-w-2xl">Queue deterministic variants across styles, palettes and seeds. Every frame is regenerated from its own seed, so a batch is fully reproducible — export the run as one ZIP with a contact sheet and a JSON manifest.</p>
+    </div>
+    <span id="bStat" class="f-m text-[11px] px-3 py-1 rounded-full border border-white/10 bg-white/5 text-zinc-400">idle</span>
+   </div>
+
+   <div class="grid gap-6 lg:grid-cols-[370px_minmax(0,1fr)] items-start">
+    <div class="space-y-5">
+     <div>
+      <div class="flex justify-between text-xs mb-1.5"><span class="text-zinc-400">Quantity</span><span id="bQtyV" class="f-m text-lime-200">8</span></div>
+      <input id="bQty" type="range" min="2" max="32" step="1" value="8">
+     </div>
+
+     <div class="grid grid-cols-2 gap-2">
+      <button id="bSeq" class="tog"><span class="t">Sequential seeds</span></button>
+      <button id="bPal" class="tog"><span class="t">Vary palettes</span></button>
+      <button id="bTwk" class="tog"><span class="t">Vary settings</span></button>
+      <button id="bSheet" class="tog"><span class="t">Contact sheet</span></button>
+     </div>
+
+     <div>
+      <div class="flex items-center justify-between gap-2 mb-2">
+       <span class="text-xs text-zinc-400">Styles in batch <span id="bSelN" class="f-m text-zinc-500"></span></span>
+       <div class="flex gap-1"><button data-bq="cur" class="mini">Current</button><button data-bq="technology" class="mini">Technology</button><button data-bq="all" class="mini">All</button></div>
+      </div>
+      <div id="bTypes" class="flex flex-wrap gap-1.5 mb-2"></div>
+      <div id="bStyles" class="grid grid-cols-2 gap-2 max-h-[212px] overflow-y-auto hs pr-1"></div>
+     </div>
+
+     <div>
+      <div class="text-xs text-zinc-400 mb-2">Export format</div>
+      <div id="bFmt" class="grid grid-cols-3 gap-2 mb-3">
+       <button data-f="png" class="tog"><span class="t">PNG</span></button>
+       <button data-f="svg" class="tog"><span class="t">SVG</span></button>
+       <button data-f="both" class="tog"><span class="t">Both</span></button>
+      </div>
+      <div class="text-xs text-zinc-400 mb-2">Batch size</div>
+      <select id="bRes" class="w-full text-sm px-3 py-2 f-m"></select>
+      <div id="bHint" class="text-[11px] text-zinc-500 mt-2"></div>
+     </div>
+
+     <div class="space-y-2 pt-1">
+      <button id="bRun" class="btn lime w-full justify-center py-2.5"></button>
+      <div class="grid grid-cols-2 gap-2">
+       <button id="bZip" class="btn justify-center" disabled></button>
+       <button id="bFiles" class="btn justify-center" disabled></button>
+      </div>
+      <button id="bClear" class="btn w-full justify-center" disabled>Clear batch</button>
+     </div>
+    </div>
+
+    <div class="min-w-0">
+     <div class="h-1.5 rounded-full bg-white/10 overflow-hidden mb-3"><div id="bBar" class="h-full bg-gradient-to-r from-lime-300 via-cyan-300 to-violet-400" style="width:0;transition:width .2s"></div></div>
+     <div id="bGrid" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[560px] overflow-y-auto hs pr-1"></div>
+    </div>
+   </div>
+  </div>
  </section>
 
  <section id="guide" class="py-16">
   <h2 class="f-d font-bold text-3xl text-white mb-6">Field guide</h2>
-  <div class="grid md:grid-cols-3 gap-4">
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
    <div class="card p-5"><div class="f-m text-lime-300 text-xs mb-2">01</div><h3 class="f-d font-semibold text-white mb-1">Wind from noise</h3><p class="text-sm text-zinc-400">Layered Perlin noise assigns every point an angle. Complexity zooms the field, turbulence scales how hard it turns.</p></div>
    <div class="card p-5"><div class="f-m text-lime-300 text-xs mb-2">02</div><h3 class="f-d font-semibold text-white mb-1">Particles leave ink</h3><p class="text-sm text-zinc-400">Thousands of particles ride the wind and leave translucent strokes. Overdraw keeps painting on the same canvas.</p></div>
-   <div class="card p-5"><div class="f-m text-lime-300 text-xs mb-2">03</div><h3 class="f-d font-semibold text-white mb-1">Seeds freeze chance</h3><p class="text-sm text-zinc-400">The same seed and settings always regrow the same piece, at any resolution, as pixels or true vector paths.</p></div>
+   <div class="card p-5"><div class="f-m text-cyan-300 text-xs mb-2">03</div><h3 class="f-d font-semibold text-white mb-1">Style types reshape the ink</h3><p class="text-sm text-zinc-400">Organic silk, geometric lattices or <b class="text-cyan-200">Technology</b> systems: styles quantise angles to 45° runs, gate strokes into packets and drop vias, pads and grids.</p></div>
+   <div class="card p-5"><div class="f-m text-violet-300 text-xs mb-2">04</div><h3 class="f-d font-semibold text-white mb-1">Seeds freeze chance</h3><p class="text-sm text-zinc-400">The same seed, style and settings always regrow the same piece at any resolution — as pixels, as true vector paths, or as a whole batch in one ZIP.</p></div>
   </div>
  </section>
 </main>
 <div class="overflow-hidden border-y border-white/10 py-4"><div id="mq" class="mq flex gap-3"></div></div>
-<footer class="text-center text-xs text-zinc-500 py-8">Flowfield Studio v2 · Deterministic Perlin flow fields · PNG &amp; SVG</footer>
+<footer class="text-center text-xs text-zinc-500 py-8">Flowfield Studio v2 · Deterministic Perlin flow fields · PNG, SVG &amp; bulk ZIP</footer>
 
 <script>
 const $=s=>document.querySelector(s);
-const IC={wave:'<path d="M2 8c3-3 5 3 10 0s7 3 10 0M2 16c3-3 5 3 10 0s7 3 10 0"/>',play:'<polygon points="6 3 20 12 6 21 6 3"/>',pause:'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',replay:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',shuffle:'<path d="m18 14 4 4-4 4M18 2l4 4-4 4M2 18h1.97a4 4 0 0 0 3.2-1.6l9.66-12.8A4 4 0 0 1 20 2h2M2 6h1.97a4 4 0 0 1 3.2 1.6l.8 1.1M22 18h-2a4 4 0 0 1-3.2-1.6l-.8-1.1"/>',layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',save:'<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',max:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',dice:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1"/><circle cx="15.5" cy="15.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/><circle cx="8.5" cy="15.5" r="1"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',check:'<path d="M20 6 9 17l-5-5"/>',spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>'};
-const ic=n=>`<svg class="ic" viewBox="0 0 24 24">${IC[n]}</svg>`;
+const IC={
+ wave:'<path d="M2 8c3-3 5 3 10 0s7 3 10 0M2 16c3-3 5 3 10 0s7 3 10 0"/>',
+ play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+ pause:'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+ replay:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+ shuffle:'<path d="m18 14 4 4-4 4M18 2l4 4-4 4M2 18h1.97a4 4 0 0 0 3.2-1.6l9.66-12.8A4 4 0 0 1 20 2h2M2 6h1.97a4 4 0 0 1 3.2 1.6l.8 1.1M22 18h-2a4 4 0 0 1-3.2-1.6l-.8-1.1"/>',
+ layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
+ save:'<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+ max:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',
+ dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+ dice:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1"/><circle cx="15.5" cy="15.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/><circle cx="8.5" cy="15.5" r="1"/>',
+ copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>',
+ grid:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',
+ cpu:'<rect x="8" y="8" width="8" height="8" rx="1.5"/><path d="M10 3v2M14 3v2M10 19v2M14 19v2M3 10h2M3 14h2M19 10h2M19 14h2"/>',
+ box:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
+ files:'<path d="M14 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>',
+ sheet:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M16 5v14M3 12h5M16 12h5"/>',
+ x:'<path d="M18 6 6 18M6 6l12 12"/>',
+ load:'<path d="M4 4v6h6"/><path d="M4 10a8 8 0 1 1 2 8"/>',
+ silk:'<path d="M2 8c3-3 5 3 10 0s7 3 10 0M2 16c3-3 5 3 10 0s7 3 10 0"/>',
+ tendril:'<path d="M4 20c3.5-1.5 5.5-6 4.5-11M10 21c4-2.5 5.5-8.5 3.5-14M16 21c3.5-2 5-6 4-9"/>',
+ gauze:'<path d="M2 8c4-3 8 3 12 0s6 2 8 0M2 13c4-3 8 3 12 0s6 2 8 0M2 18c4-3 8 3 12 0s6 2 8 0"/>',
+ iso:'<path d="M12 3l9 9-9 9-9-9z"/><path d="M7.5 7.5 12 12l4.5-4.5M7.5 16.5 12 12l4.5 4.5"/>',
+ lattice:'<path d="M4 4h3.4M4 4v3.4M11.3 4h3.4M11.3 4v3.4M18.6 4h1.4M4 11.3h3.4M4 11.3v3.4M11.3 11.3h3.4M11.3 11.3v3.4M18.6 11.3h1.4M4 18.6h3.4M4 18.6v1.4M11.3 18.6h3.4M11.3 18.6v1.4M18.6 18.6h1.4"/>',
+ circuit:'<path d="M2 7h6l3 3h11M2 17h5l3-3M18 3v6h4M2 12h4"/><circle cx="11" cy="10" r="1.3" fill="currentColor" stroke="none"/>',
+ neural:'<path d="M5.5 6 12 12l6.5-6M5.5 18 12 12l6.5 6"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="5.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="5.5" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="18" r="1.4" fill="currentColor" stroke="none"/>',
+ data:'<path d="M6 3v4.5M6 11v4.5M6 19v2M12 3v7M12 14v7M18 3v3M18 9.5v5M18 18v3"/>',
+ blueprint:'<path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" opacity=".45"/><path d="M6 17l3-3 3 2 4.5-5"/>',
+ glitch:'<path d="M3 8h4.5M10 8h2.5M15 8h6M3 13h2.5M8.5 13h7M18.5 13h2.5M3 18h5M11 18h3M17 18h4"/>'
+};
+const ic=(n,cls='ic')=>`<svg class="${cls}" viewBox="0 0 24 24">${IC[n]||IC.silk}</svg>`;
 
-/* ---------- engine ---------- */
+/* ===================== engine:start ===================== */
 function mulberry32(a){a>>>=0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 function makePerlin(seed){const r=mulberry32(seed),p=[...Array(256).keys()];
  for(let i=255;i>0;i--){const j=Math.floor(r()*(i+1));[p[i],p[j]]=[p[j],p[i]]}
@@ -115,6 +228,8 @@ function makePerlin(seed){const r=mulberry32(seed),p=[...Array(256).keys()];
   return lerp(lerp(grad(P[A],x,y),grad(P[B],x-1,y),u),lerp(grad(P[A+1],x,y-1),grad(P[B+1],x-1,y-1),u),v)}
  function fbm(x,y,o=3,lac=2,gain=.5){let s=0,a=1,f=1,n=0;for(let i=0;i<o;i++){s+=a*noise(x*f,y*f);n+=a;a*=gain;f*=lac}return s/n}
  return{noise,fbm}}
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const rnd=(a,b,s)=>Math.round((a+Math.random()*(b-a))/s)*s;
 
 const PAL=[
 ["aurora","Aurora","Polar lights","#060d14",["#7df9ff","#4ade80","#a78bfa","#f0fdf4","#22d3ee"]],
@@ -128,130 +243,373 @@ const PAL=[
 ["bloom","Midnight Bloom","Neon garden","#0d0714",["#f0abfc","#fb7185","#facc15","#a78bfa","#fdf4ff"]],
 ["matcha","Matcha Paper","Soft daylight","#f2f0e6",["#3f6212","#65a30d","#0f766e","#a16207","#1c1917"]],
 ["magma","Magma & Ice","High contrast","#08080c",["#f97316","#38bdf8","#f8fafc","#ef4444","#a5b4fc"]],
-["candy","Candy Static","Playful pop","#160a18",["#f9a8d4","#67e8f9","#fde047","#c4b5fd","#ffffff"]]
+["candy","Candy Static","Playful pop","#160a18",["#f9a8d4","#67e8f9","#fde047","#c4b5fd","#ffffff"]],
+["terminal","Terminal Green","CRT phosphor","#04070499",["#22c55e","#4ade80","#a3e635","#eaffea","#16a34a"]],
+["cyber","Cyberdeck","Neon city chip","#06070f",["#22d3ee","#f0abfc","#a3e635","#f8fafc","#6366f1"]],
+["pcb","PCB Solder","Copper & mask","#04120c",["#34d399","#a7f3d0","#fbbf24","#f0fdf4","#0ea5e9"]],
+["schematic","Schematic","Drafting blue","#061a3a",["#dbeafe","#93c5fd","#f8fafc","#60a5fa","#bfdbfe"]],
+["ledger","Silicon Ledger","Server rack mono","#0b0b0f",["#e4e4e7","#f59e0b","#22d3ee","#71717a","#fafafa"]]
 ].map(a=>({id:a[0],name:a[1],mood:a[2],bg:a[3],colors:a[4]}));
 
-const RES={preview:["Canvas fit",0,0,"Exactly what you see"],hd:["Desktop HD",1920,1080],qhd:["Desktop QHD",2560,1440],"4k":["4K UHD",3840,2160],ultrawide:["Ultrawide",3440,1440],phone:["Phone",1170,2532],square:["Square",2048,2048]};
+const TYPES=[
+{id:'organic',name:'Organic',icon:'silk',blurb:'Silk, tendrils, soft ink'},
+{id:'geometry',name:'Geometry',icon:'grid',blurb:'Meshes, lattices, hard angles'},
+{id:'technology',name:'Technology',icon:'cpu',blurb:'Circuits, neural nets, data packets'}];
 
-function makeSim(W,H,p,pal,bg){
- const sc=Math.max(W,H)/1600,per=makePerlin(p.seed),rng=mulberry32((p.seed^2654435769)>>>0),n=pal.colors.length;
- const ps=[];
- function spawn(q){q.x=rng()*W;q.y=rng()*H;q.age=0;q.life=Math.max(10,Math.round(p.maxLife*(.5+.5*rng())));
+/* f = style behaviour flags:
+   quant       : snap the field angle to N directions (8 = 45°, 4 = 90°)
+   quantNoise  : 0..1 chance of ignoring the snap (glitchy routing)
+   hold        : 0..1 inertia — keep the previous direction for longer runs
+   dashOn/Off  : gate strokes into packets measured in sim steps
+   dots        : 'pad' | 'bend' | 'step' | 'both' | null — node/via markers
+   dotEvery    : emit a step-node every N steps
+   dotR        : node radius multiplier (of stroke width)
+   holes       : draw a drilled centre in pads (PCB vias)
+   glow        : bloom width multiplier
+   jitter      : per-step random offset in sim px
+   streak      : chance of a long horizontal streak (glitch scanlines)
+   gridOverlay : background grid pitch (sim px, scaled) ; gridAlpha optional
+   frame/label : drafting border + metadata label (blueprint)
+   cap/join/mul: stroke finish + width/opacity/speed/life multipliers        */
+const STY=[
+{id:'silk',name:'Silk Ribbons',type:'organic',icon:'silk',blurb:'Classic smooth inked ribbons',f:{},preset:{}},
+{id:'tendril',name:'Tendrils',type:'organic',icon:'tendril',blurb:'Fine wispy threads, long trails',f:{widthMul:.5,speedMul:1.3,lifeMul:1.4,opacityMul:.85},preset:{lineWidth:1.4,particleCount:3200,maxLife:200,lineVariation:.75}},
+{id:'gauze',name:'Gauze',type:'organic',icon:'gauze',blurb:'Wide, soft, layered veils',f:{widthMul:2.4,opacityMul:.32,lifeMul:.8},preset:{lineWidth:1.6,opacity:.5,particleCount:2200,curl:2.6,speed:1.1}},
+{id:'iso',name:'Isometric Mesh',type:'geometry',icon:'iso',blurb:'90° lattice, diamond weave',f:{quant:4,hold:.34,cap:'square',join:'miter',widthMul:1.25,opacityMul:.9},preset:{frequency:3.6,curl:2.4,speed:1.9,lineVariation:.25,maxLife:200}},
+{id:'lattice',name:'Vector Lattice',type:'geometry',icon:'lattice',blurb:'Grid paper with plotted dashes',f:{dashOn:4,dashOff:5,cap:'square',gridOverlay:48,widthMul:1.1,speedMul:.85},preset:{frequency:3.2,curl:2.2,particleCount:3000,maxLife:180,lineWidth:1.2}},
+{id:'circuit',name:'Circuit Trace',type:'technology',icon:'circuit',blurb:'PCB routing: 45° runs, vias, pads',f:{quant:8,hold:.55,cap:'square',join:'miter',dots:'both',dotR:1.5,holes:true,gridOverlay:64,widthMul:.9,speedMul:1.05},preset:{frequency:3.4,curl:2.6,particleCount:2400,maxLife:220,lineWidth:1.1,lineVariation:.35,opacity:.7}},
+{id:'neural',name:'Neural Net',type:'technology',icon:'neural',blurb:'Node graph with glowing synapses',f:{dots:'step',dotEvery:16,dotR:2.2,glow:3.2,widthMul:.8,opacityMul:.85},preset:{frequency:2.4,curl:3.2,particleCount:1800,maxLife:260,lineWidth:1,speed:1.3}},
+{id:'datastream',name:'Data Stream',type:'technology',icon:'data',blurb:'Fast dashes, packet trains, bloom',f:{dashOn:3,dashOff:7,glow:2.6,widthMul:.8,cap:'butt',speedMul:1.5,lifeMul:1.4,opacityMul:.9},preset:{frequency:5,curl:3.8,particleCount:2600,maxLife:220,lineWidth:1.2,speed:1.8,opacity:.8}},
+{id:'glitch',name:'Glitch Scan',type:'technology',icon:'glitch',blurb:'Snapped routing with torn scanlines',f:{quant:8,quantNoise:.3,hold:.3,jitter:1.6,streak:.014,streakLen:60,glow:2.2,widthMul:.8,cap:'butt'},preset:{frequency:4.6,curl:4.2,particleCount:2600,maxLife:200,lineWidth:1.1,opacity:.75}},
+{id:'blueprint',name:'Blueprint',type:'technology',icon:'blueprint',blurb:'Drafting dashes, grid, title block',f:{dashOn:11,dashOff:5,widthMul:.45,cap:'butt',opacityMul:.55,gridOverlay:40,gridAlpha:.16,frame:true,label:true},preset:{frequency:2.8,curl:2.2,particleCount:3200,maxLife:240,lineWidth:1.2,opacity:.9,lineVariation:.4}}];
+const STYBY={};STY.forEach(s=>STYBY[s.id]=s);
+const stylesOfType=t=>STY.filter(s=>s.type===t);
+
+const RES={preview:["Canvas fit",0,0,"Exactly what you see"],hd:["Desktop HD",1920,1080],qhd:["Desktop QHD",2560,1440],"4k":["4K UHD",3840,2160],ultrawide:["Ultrawide",3440,1440],phone:["Phone",1170,2532],square:["Square",2048,2048]};
+const resDims=r=>{if(r==='preview')return[1280,720];const e=RES[r];return e&&e[1]?[e[1],e[2]]:[1280,720]};
+
+function makeSim(W,H,p,palObj,bg,sty){
+ const F=(sty&&sty.f)||{},sc=Math.max(W,H)/1600;
+ let idSeq=0;
+ const per=makePerlin(p.seed),rng=mulberry32((p.seed^2654435769)>>>0),n=palObj.colors.length;
+ const sp=Math.max(.05,p.speed*sc*(F.speedMul||1));
+ const lifeM=F.lifeMul||1,widthM=F.widthMul||1;
+ const dashOn=F.dashOn||0,dashLen=dashOn+(F.dashOff||0);
+ const dots=F.dots||null,padDot=dots==='pad'||dots==='both',bendDot=dots==='bend'||dots==='both',stepDot=dots==='step';
+ const dotEvery=F.dotEvery||0,dotR=F.dotR||1.8,nodes=[],ps=[];
+ const angleAt=(x,y)=>per.fbm((x/W)*p.frequency+p.seed*13e-6,(y/H)*p.frequency,p.octaves)*Math.PI*p.curl+p.rotation;
+ function spawn(q){
+  q.id=++idSeq;
+  q.x=rng()*W;q.y=rng()*H;q.age=0;q.steps=0;q.lastA=null;
+  q.phase=dashLen?Math.floor(rng()*dashLen):0;
+  q.life=Math.max(10,Math.round(p.maxLife*lifeM*(.5+.5*rng())));
   const v=(per.fbm((q.x/W)*2.2+p.seed*1e-4,(q.y/H)*2.2,2)*.5+.5)*p.colorSpread+rng()*(1-p.colorSpread);
   q.c=Math.abs(Math.floor(v*n*1.15))%n;
-  q.w=Math.max(.1,Math.round(p.lineWidth*sc*(1-p.lineVariation*rng()*.7)*10)/10);q.pts=[[q.x,q.y]];return q}
+  q.w=Math.max(.1,Math.round(p.lineWidth*sc*widthM*(1-p.lineVariation*rng()*.7)*10)/10);
+  if(padDot)nodes.push({x:q.x,y:q.y,r:Math.max(1,q.w*dotR*1.3),c:q.c,pad:1});
+  return q}
  for(let i=0;i<p.particleCount;i++)ps.push(spawn({}));
- return{W,H,sc,pal,bg,p,step(seg,end){const sp=p.speed*sc;
-  for(const q of ps){const a=per.fbm((q.x/W)*p.frequency+p.seed*13e-6,(q.y/H)*p.frequency,p.octaves)*Math.PI*p.curl+p.rotation;
-   const ox=q.x,oy=q.y;q.x+=Math.cos(a)*sp;q.y+=Math.sin(a)*sp;q.age++;
-   if(seg)seg(q.c,q.w,ox,oy,q.x,q.y);
-   if(end)q.pts.push([q.x,q.y]);
-   if(q.age>=q.life||q.x<-20||q.y<-20||q.x>W+20||q.y>H+20){if(end)end(q);spawn(q)}}},
-  flush(end){for(const q of ps)end(q)}}}
-function drawTick(sim,ctx){const m=new Map();
- sim.step((c,w,ox,oy,nx,ny)=>{const k=c+'|'+w;let p=m.get(k);if(!p){p=new Path2D();m.set(k,p)}p.moveTo(ox,oy);p.lineTo(nx,ny)});
- ctx.globalAlpha=sim.p.opacity;ctx.lineCap='round';
- for(const[k,p]of m){const[c,w]=k.split('|');ctx.strokeStyle=sim.pal.colors[+c];ctx.lineWidth=+w;ctx.stroke(p)}}
+ return{W,H,sc,p,sty,nodes,ps,
+  step(seg){
+   for(const q of ps){
+    let a=angleAt(q.x,q.y);
+    if(F.quant){const qa=Math.PI*2/F.quant,s=Math.round(a/qa)*qa;if(!F.quantNoise||rng()>=F.quantNoise)a=s}
+    if(F.hold&&q.lastA!==null&&rng()<F.hold)a=q.lastA;
+    const ox=q.x,oy=q.y;
+    let ex=ox+Math.cos(a)*sp,ey=oy+Math.sin(a)*sp;
+    if(F.jitter){ex+=(rng()-.5)*F.jitter*sc;ey+=(rng()-.5)*F.jitter*sc}
+    q.x=ex;q.y=ey;q.age++;q.steps++;
+    if(seg){
+     const on=!dashLen||((q.age+q.phase)%dashLen)<dashOn;
+     let tx=ex,ty=ey;
+     if(F.streak&&rng()<F.streak)tx+=(rng()<.5?-1:1)*(F.streakLen||40)*sc;
+     if(on)seg(q.id,q.c,q.w,ox,oy,tx,ty)}
+    if(bendDot&&q.lastA!==null&&Math.abs(a-q.lastA)>1e-6)nodes.push({x:ox,y:oy,r:Math.max(1,q.w*dotR),c:q.c});
+    if(stepDot&&(!dotEvery||q.steps%dotEvery===0))nodes.push({x:q.x,y:q.y,r:Math.max(1,q.w*dotR),c:q.c});
+    q.lastA=a;
+    if(q.age>=q.life||q.x<-20||q.y<-20||q.x>W+20||q.y>H+20){
+     if(padDot)nodes.push({x:q.x,y:q.y,r:Math.max(1,q.w*dotR*1.3),c:q.c,pad:1});
+     spawn(q)}}}}
+}
+const nf=v=>{const r=Math.round(v*10)/10;return Number.isInteger(r)?String(r):r.toFixed(1)};
+/* Segs collects strokes as chained polyline runs per (colour:width) key.
+   Consecutive points on the same run share one `M`, and near-collinear points
+   inside `tol` px are dropped — that keeps canvas paths and SVG output small. */
+function Segs(tol=0.4){const g=new Map(),last=new Map();
+ return{g,
+  add(pid,c,w,x1,y1,x2,y2){
+   const k=c+':'+w;let runs=g.get(k);if(!runs){runs=[];g.set(k,runs)}
+   const l=last.get(pid);
+   if(l&&l.k===k&&l.ex===x1&&l.ey===y1){
+    const r=l.run.pts,n=r.length;
+    if(n>=4){const ax=r[n-4],ay=r[n-3],bx=r[n-2],by=r[n-1];
+     const dx=x2-ax,dy=y2-ay,L=Math.hypot(dx,dy);
+     if(L>1e-6&&Math.abs((bx-ax)*dy-(by-ay)*dx)/L<tol)r.length-=2}
+    if(r.length<2||r[r.length-2]!==x2||r[r.length-1]!==y2)r.push(x2,y2);
+    l.ex=x2;l.ey=y2;return}
+   const run={pts:[x1,y1,x2,y2]};
+   runs.push(run);last.set(pid,{k,run,ex:x2,ey:y2})}}}
+function isLight(hex){const h=String(hex||'#000').replace('#','').slice(0,6);
+ if(h.length===3)return(parseInt(h[0],16)+parseInt(h[1],16)+parseInt(h[2],16))/3>8;
+ const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+ return (r*.299+g*.587+b*.114)>140}
+function styleAlpha(p,st){return clamp(p.opacity*((st.f&&st.f.opacityMul)||1),.01,1)}
+
+function paintBase(ctx,W,H,sty,palObj,bg,meta){
+ const F=(sty&&sty.f)||{},sc=Math.max(W,H)/1600,light=isLight(bg);
+ ctx.globalAlpha=1;ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ if(F.gridOverlay){
+  const g=Math.max(6,F.gridOverlay*sc),a=F.gridAlpha!=null?F.gridAlpha:(light?.07:.05);
+  ctx.save();ctx.strokeStyle=light?`rgba(10,20,40,${a})`:`rgba(255,255,255,${a})`;ctx.lineWidth=Math.max(1,sc*.6);
+  ctx.beginPath();for(let x=g;x<W;x+=g){ctx.moveTo(x,0);ctx.lineTo(x,H)}for(let y=g;y<H;y+=g){ctx.moveTo(0,y);ctx.lineTo(W,y)}ctx.stroke();ctx.restore()}
+ if(F.frame){
+  const m=Math.round(18*sc),c=light?'rgba(20,40,80,.45)':'rgba(255,255,255,.28)';
+  ctx.save();ctx.strokeStyle=c;ctx.lineWidth=Math.max(1,sc);
+  ctx.beginPath();ctx.rect(m,m,W-m*2,H-m*2);ctx.stroke();
+  const t=Math.round(26*sc);
+  ctx.beginPath();[[m,m,1,1],[W-m,m,-1,1],[m,H-m,1,-1],[W-m,H-m,-1,-1]].forEach(([x,y,sx,sy])=>{ctx.moveTo(x+sx*t,y);ctx.lineTo(x,y);ctx.lineTo(x,y+sy*t)});ctx.stroke();
+  if(F.label&&meta){
+   ctx.fillStyle=light?'rgba(20,40,80,.6)':'rgba(255,255,255,.5)';
+   ctx.font=`${Math.round(13*sc)}px "JetBrains Mono",ui-monospace,monospace`;ctx.textBaseline='alphabetic';
+   ctx.fillText(`FLOWFIELD · ${String(sty.name).toUpperCase()} · SEED ${meta.seed} · ${W}×${H}`,m+Math.round(10*sc),H-m-Math.round(9*sc))}
+  ctx.restore()}
+}
+function strokeSegs(ctx,segs,colors,o){
+ const alpha=o.alpha,glow=o.glow||0;
+ ctx.lineCap=o.cap||'round';ctx.lineJoin=o.join||'round';
+ const passes=glow>1?[[glow,alpha*.22],[1,alpha]]:[[1,alpha]];
+ for(const[mul,al]of passes){
+  ctx.globalAlpha=al;
+  for(const[k,runs]of segs.g){
+   const ci=k.indexOf(':'),c=+k.slice(0,ci),w=+k.slice(ci+1);
+   const p=new Path2D();
+   for(const run of runs){const r=run.pts;p.moveTo(r[0],r[1]);for(let i=2;i<r.length;i+=2)p.lineTo(r[i],r[i+1])}
+   ctx.strokeStyle=colors[c]||colors[0];ctx.lineWidth=w*mul;ctx.stroke(p)}}
+ ctx.globalAlpha=1;
+}
+function paintNodes(ctx,nodes,colors,bg,sty,alpha){
+ if(!nodes||!nodes.length)return;const holes=sty.f&&sty.f.holes;
+ ctx.globalAlpha=alpha;
+ for(const nd of nodes){ctx.fillStyle=colors[nd.c]||colors[0];ctx.beginPath();ctx.arc(nd.x,nd.y,nd.r,0,6.2832);ctx.fill();
+  if(holes&&nd.pad){ctx.fillStyle=bg;ctx.beginPath();ctx.arc(nd.x,nd.y,nd.r*.45,0,6.2832);ctx.fill()}}
+ ctx.globalAlpha=1;
+}
+function gridSVG(W,H,sty,bg){const F=sty.f||{};
+ if(!F.gridOverlay)return'';const sc=Math.max(W,H)/1600,g=Math.max(6,F.gridOverlay*sc),light=isLight(bg);
+ const a=F.gridAlpha!=null?F.gridAlpha:(light?.07:.05);
+ let d='';for(let x=g;x<W;x+=g)d+=`M${x.toFixed(1)} 0V${H}`;for(let y=g;y<H;y+=g)d+=`M0 ${y.toFixed(1)}H${W}`;
+ return `<path stroke="${light?'#0a1428':'#ffffff'}" stroke-opacity="${a}" stroke-width="${Math.max(1,sc*.6).toFixed(2)}" fill="none" d="${d}"/>`}
+function frameSVG(W,H,sty,bg,meta){const F=sty.f||{};if(!F.frame)return'';const sc=Math.max(W,H)/1600,m=18*sc,light=isLight(bg);
+ const c=light?'#142850':'#ffffff',a=light?.45:.28,t=26*sc;
+ let d=`M${(m+t).toFixed(1)} ${m.toFixed(1)}H${m.toFixed(1)}V${(m+t).toFixed(1)}M${(W-m-t).toFixed(1)} ${m.toFixed(1)}H${(W-m).toFixed(1)}V${(m+t).toFixed(1)}M${(m+t).toFixed(1)} ${(H-m).toFixed(1)}H${m.toFixed(1)}V${(H-m-t).toFixed(1)}M${(W-m-t).toFixed(1)} ${(H-m).toFixed(1)}H${(W-m).toFixed(1)}V${(H-m-t).toFixed(1)}`;
+ let out=`<rect x="${m.toFixed(1)}" y="${m.toFixed(1)}" width="${(W-m*2).toFixed(1)}" height="${(H-m*2).toFixed(1)}" fill="none" stroke="${c}" stroke-opacity="${a}" stroke-width="${sc.toFixed(2)}"/>`
+  +`<path d="${d}" fill="none" stroke="${c}" stroke-opacity="${a}" stroke-width="${sc.toFixed(2)}"/>`;
+ if(F.label&&meta)out+=`<text x="${(m+10*sc).toFixed(1)}" y="${(H-m-9*sc).toFixed(1)}" fill="${c}" fill-opacity=".62" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="${(13*sc).toFixed(1)}">FLOWFIELD · ${String(sty.name).toUpperCase()} · SEED ${meta.seed} · ${W}×${H}</text>`;
+ return out}
+function buildSVG(segs,nodes,W,H,sty,palObj,bg,opacity,meta){
+ const F=(sty&&sty.f)||{},sc=Math.max(W,H)/1600,alpha=clamp(opacity*((F.opacityMul)||1),.01,1);
+ let ink='';
+ for(const[k,runs]of segs.g){const ci=k.indexOf(':'),c=+k.slice(0,ci),w=+k.slice(ci+1);
+  let d='';
+  for(const run of runs){const r=run.pts;d+='M';for(let i=0;i<r.length;i+=2)d+=nf(r[i])+' '+nf(r[i+1])+' '}
+  ink+=`<path stroke="${palObj.colors[c]||palObj.colors[0]}" stroke-width="${nf(w)}" d="${d.trim()}"/>`}
+ let nd='';
+ for(const n of nodes||[]){nd+=`<circle cx="${nf(n.x)}" cy="${nf(n.y)}" r="${nf(n.r)}" fill="${palObj.colors[n.c]||palObj.colors[0]}"/>`;
+  if(F.holes&&n.pad)nd+=`<circle cx="${nf(n.x)}" cy="${nf(n.y)}" r="${nf(n.r*.45)}" fill="${bg}"/>`}
+ const bloom=F.glow>1;
+ const attrs=`fill="none" stroke-linecap="${F.cap||'round'}" stroke-linejoin="${F.join||'round'}" stroke-opacity="${alpha.toFixed(3)}"`;
+ const defs=`<clipPath id="ab"><rect width="${W}" height="${H}"/></clipPath>`
+  +(bloom?`<filter id="glo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${nf(F.glow*sc*.9)}"/></filter>`
+   +`<g id="ink" ${attrs}>${ink}${nd}</g>`:'');
+ const body=bloom
+  ?`<g clip-path="url(#ab)"><g filter="url(#glo)" opacity=".5"><use href="#ink" xlink:href="#ink"/></g><use href="#ink" xlink:href="#ink"/></g>`
+  :`<g clip-path="url(#ab)" ${attrs}>${ink}${nd}</g>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" overflow="hidden">`
+ +`<defs>${defs}</defs>`
+ +`<rect width="100%" height="100%" fill="${bg}"/>`
+ +`<g clip-path="url(#ab)">${gridSVG(W,H,sty,bg)}</g>`
+ +body
+ +`<g clip-path="url(#ab)">${frameSVG(W,H,sty,bg,meta)}</g></svg>`}
+const _ct=(()=>{const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);t[i]=c>>>0}return t})();
+function crc32(u8){let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=_ct[(c^u8[i])&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+async function toU8(d){if(d instanceof Uint8Array)return d;if(typeof d==='string')return new TextEncoder().encode(d);return new Uint8Array(await d.arrayBuffer())}
+async function deflateRaw(u8){ /* raw deflate for ZIP method 8; null when unsupported */
+ if(typeof CompressionStream==='undefined')return null;
+ try{const cs=new CompressionStream('deflate-raw');
+  return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(cs)).arrayBuffer())}
+ catch(e){return null}}
+async function makeZip(files){
+ const enc=new TextEncoder(),now=new Date();
+ const dt=((now.getHours()<<11)|(now.getMinutes()<<5)|Math.floor(now.getSeconds()/2))&0xFFFF;
+ const dd=(((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate())&0xFFFF;
+ const chunks=[],cd=[];let off=0;
+ for(const f of files){
+  const name=enc.encode(f.name),data=await toU8(f.data),crc=crc32(data);
+  const z=await deflateRaw(data);
+  const method=z&&z.length<data.length?8:0,payload=method?z:data;
+  const h=new DataView(new ArrayBuffer(30));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0,true);h.setUint16(8,method,true);
+  h.setUint16(10,dt,true);h.setUint16(12,dd,true);h.setUint32(14,crc,true);
+  h.setUint32(18,payload.length,true);h.setUint32(22,data.length,true);
+  h.setUint16(26,name.length,true);h.setUint16(28,0,true);
+  chunks.push(new Uint8Array(h.buffer),name,payload);
+  const c=new DataView(new ArrayBuffer(46));
+  c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0,true);c.setUint16(10,method,true);
+  c.setUint16(12,dt,true);c.setUint16(14,dd,true);c.setUint32(16,crc,true);c.setUint32(20,payload.length,true);c.setUint32(24,data.length,true);
+  c.setUint16(28,name.length,true);c.setUint16(30,0,true);c.setUint16(32,0,true);c.setUint16(34,0,true);c.setUint16(36,0,true);c.setUint32(38,0,true);c.setUint32(42,off,true);
+  cd.push(new Uint8Array(c.buffer),name);
+  off+=30+name.length+payload.length}
+ let cdLen=0;for(const c of cd)cdLen+=c.length;
+ const e=new DataView(new ArrayBuffer(22));
+ e.setUint32(0,0x06054b50,true);e.setUint16(4,0,true);e.setUint16(6,0,true);
+ e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cdLen,true);e.setUint32(16,off,true);e.setUint16(20,0,true);
+ return new Blob([...chunks,...cd,new Uint8Array(e.buffer)],{type:'application/zip'})}
+/* ===================== engine:end ===================== */
 
 /* ---------- state ---------- */
 const DEF={seed:48211,particleCount:2600,maxLife:140,frequency:4.2,curl:3.4,octaves:3,rotation:0,lineWidth:1.1,opacity:.55,speed:1.6,lineVariation:.6,colorSpread:.85};
-const S={...DEF,pal:0,bgOv:null,fmt:'png',res:'hd'};
+const S={...DEF,pal:0,bgOv:null,fmt:'png',res:'hd',sty:'silk',presets:true};
 const SL=[
 ["Composition",[["particleCount","Particles",400,7000,100,0],["maxLife","Trail length",20,320,5,0],["speed","Speed",.4,4,.1,1,"×"]]],
 ["Wind field",[["frequency","Complexity",1.5,12,.1,1],["curl","Turbulence",.5,8,.1,1,"π"],["octaves","Detail octaves",1,5,1,0],["rotation","Swirl rotation",0,6.28,.05,2]]],
 ["Ink",[["lineWidth","Line width",.4,3,.1,1,"px"],["opacity","Opacity",.05,1,.05,2],["lineVariation","Width jitter",0,1,.05,2],["colorSpread","Color mixing",0,1,.05,2]]]];
+const B={count:8,seq:true,varyPal:true,tweak:false,sheet:true,res:'hd',fmt:'png',
+ sel:stylesOfType('technology').map(s=>s.id),typeFilter:'all',items:[],busy:false,cancel:false,urls:[],sheetBlob:null,plan:[]};
+
 const cv=$('#cv'),ctx=cv.getContext('2d');
 let sim=null,stepsDone=0,target=0,playing=true,gallery=[],timer=null,busy=false;
-const pal=()=>PAL[S.pal],bgc=()=>S.bgOv||pal().bg;
+const pal=()=>PAL[S.pal],bgc=()=>S.bgOv||pal().bg,sty=()=>STYBY[S.sty]||STY[0];
 
 function restart(play=true){
- sim=makeSim(cv.width,cv.height,S,pal(),bgc());ctx.globalAlpha=1;ctx.fillStyle=bgc();ctx.fillRect(0,0,cv.width,cv.height);
+ sim=makeSim(cv.width,cv.height,S,pal(),bgc(),sty());
+ paintBase(ctx,cv.width,cv.height,sty(),pal(),bgc(),{seed:S.seed});
  stepsDone=0;target=S.particleCount*S.maxLife;if(play)playing=true;hud()}
 const debounced=()=>{clearTimeout(timer);timer=setTimeout(()=>restart(),150)};
 function overdraw(){target+=S.particleCount*S.maxLife*.7;playing=true;hud()}
 const done=()=>stepsDone>=target;
-function loop(){if(playing&&!done()){for(let i=0;i<2&&!done();i++){drawTick(sim,ctx);stepsDone+=S.particleCount}if(done())hud();else prog()}requestAnimationFrame(loop)}
+function tickPreview(){
+ const sg=Segs(.35*Math.max(cv.width,cv.height)/1600),st=sty(),a=styleAlpha(S,st);
+ sim.step((id,c,w,x1,y1,x2,y2)=>sg.add(id,c,w,x1,y1,x2,y2));
+ strokeSegs(ctx,sg,pal().colors,{alpha:a,glow:st.f.glow||0,cap:st.f.cap||'round',join:st.f.join||'round'});
+ paintNodes(ctx,sim.nodes.splice(0),pal().colors,bgc(),st,a)}
+function loop(){if(playing&&!done()){for(let i=0;i<2&&!done();i++){tickPreview();stepsDone+=S.particleCount}if(done())hud();else prog()}requestAnimationFrame(loop)}
 const pct=()=>Math.min(100,Math.round(stepsDone/(S.particleCount*S.maxLife)*100));
 function prog(){$('#bar').style.width=pct()+'%';$('#hPart').textContent=`${S.particleCount.toLocaleString()} particles · ${pct()}%`}
 
-/* ---------- export ---------- */
-const dims=()=>S.res==='preview'?[cv.width,cv.height]:[RES[S.res][1],RES[S.res][2]];
-async function save(blob,name){let d=null;try{d=await window.claude?.use('downloads')}catch(e){}
+/* ---------- save / toast ---------- */
+async function saveBlob(blob,name){let d=null;try{d=await window.claude?.use('downloads')}catch(e){}
  if(d){try{await d.save({filename:name,data:blob});return 1}catch(e){if(e&&e.code==='declined')return 0;toast('Save unavailable: '+(e&&e.code||'error'));return 0}}
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);return 1}
-function toast(t){let e=$('#toast');if(!e){e=document.createElement('div');e.id='toast';e.className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 f-m text-xs bg-lime-300 text-black rounded-full px-4 py-2';document.body.appendChild(e)}e.textContent=t;e.style.display=t?'block':'none'}
-const tick0=()=>new Promise(r=>setTimeout(r));
-async function exportAs(fmt){if(busy)return;busy=true;toast('Rendering '+fmt.toUpperCase()+'…');
- try{const[W,H]=dims(),ex=new makeSim(W,H,S,pal(),bgc()),name=`flowfield-${S.seed}-${S.res}.${fmt}`;
-  if(fmt==='png'){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle=bgc();x.fillRect(0,0,W,H);
-   for(let t=0;t<S.maxLife;t++){drawTick(ex,x);if(t%8==7)await tick0()}
-   const b=await new Promise(r=>c.toBlob(r,'image/png'));toast('Ready — confirm the save');await save(b,name)}
-  else{const g=new Map(),inb=p=>p[0]>=0&&p[0]<=W&&p[1]>=0&&p[1]<=H,cl=p=>[Math.min(W,Math.max(0,p[0])),Math.min(H,Math.max(0,p[1]))],
-   f=q=>{const P=q.pts,runs=[];let r=[];
-    for(let i=0;i<P.length;i++){const p=P[i];if(inb(p)){if(!r.length&&i>0)r.push(cl(P[i-1]));r.push(p)}else if(r.length){r.push(cl(p));runs.push(r);r=[]}}
-    if(r.length)runs.push(r);
-    for(const u of runs)if(u.length>1){const k=q.c+'|'+q.w;g.set(k,(g.get(k)||'')+'M'+u.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L'))}
-    q.pts=[[q.x,q.y]]};
-   for(let t=0;t<S.maxLife;t++){ex.step(null,q=>f(q));if(t%8==7)await tick0()}
-   ex.flush(f);
-   let paths='';for(const[k,d]of g){const[c,w]=k.split('|');paths+=`<path stroke="${pal().colors[+c]}" stroke-width="${w}" d="${d}"/>`}
-   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" overflow="hidden"><defs><clipPath id="ab"><rect width="${W}" height="${H}"/></clipPath></defs><rect width="100%" height="100%" fill="${bgc()}"/><g clip-path="url(#ab)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="${S.opacity}">${paths}</g></svg>`;
-   toast('Ready — confirm the save');await save(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),name)}
-  toast('');}catch(e){toast('Export failed')}
- busy=false;setTimeout(()=>toast(''),2500)}
+let toastTimer=null;
+function toast(t,ms=2200){let e=$('#toast');if(!e){e=document.createElement('div');e.id='toast';e.className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 f-m text-xs bg-lime-300 text-black rounded-full px-4 py-2 max-w-[90vw] text-center';document.body.appendChild(e)}
+ e.textContent=t;e.style.display=t?'block':'none';clearTimeout(toastTimer);if(t)toastTimer=setTimeout(()=>{e.style.display='none'},ms)}
+const tick0=()=>new Promise(r=>setTimeout(r,0));
 
-/* ---------- UI ---------- */
+/* ---------- single export ---------- */
+const toBlob=(c,type='image/png')=>new Promise(r=>c.toBlob(r,type));
+async function exportAs(fmt){if(busy)return;busy=true;toast('Rendering '+fmt.toUpperCase()+'…',8000);
+ try{const[W,H]=resDims(S.res),st=sty(),pa=pal(),bg=bgc(),p=S,pname=S.seed;
+  const name=`flowfield-${st.id}-${pname}-${W}x${H}.${fmt}`;
+  if(fmt==='png'){
+   const segs=Segs(.35*Math.max(W,H)/1600),sm=makeSim(W,H,p,pa,bg,st),seg=(id,c,w,x1,y1,x2,y2)=>segs.add(id,c,w,x1,y1,x2,y2);
+   const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+   paintBase(x,W,H,st,pa,bg,{seed:p.seed});
+   for(let t=0;t<Math.max(12,Math.round(p.maxLife));t++){sm.step(seg);if(t%8===7)await tick0()}
+   strokeSegs(x,segs,pa.colors,{alpha:styleAlpha(p,st),glow:st.f.glow||0,cap:st.f.cap||'round',join:st.f.join||'round'});
+   paintNodes(x,sm.nodes,pa.colors,bg,st,styleAlpha(p,st));
+   toast('Ready — confirm the save',9000);await saveBlob(await toBlob(c,'image/png'),name)}
+  else{
+   const segs=Segs(.35*Math.max(W,H)/1600),sm=makeSim(W,H,p,pa,bg,st),seg=(id,c,w,x1,y1,x2,y2)=>segs.add(id,c,w,x1,y1,x2,y2);
+   for(let t=0;t<Math.max(12,Math.round(p.maxLife));t++){sm.step(seg);if(t%8===7)await tick0()}
+   const svg=buildSVG(segs,sm.nodes,W,H,st,pa,bg,p.opacity,{seed:p.seed});
+   toast('Ready — confirm the save',9000);await saveBlob(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),name)}
+  toast('');}catch(e){console.error(e);toast('Export failed')}
+ busy=false;setTimeout(()=>toast(''),2500)}
+const exp=()=>exportAs(S.fmt);
+
+/* ---------- gallery ---------- */
 function snap(){const c=document.createElement('canvas');c.width=240;c.height=135;c.getContext('2d').drawImage(cv,0,0,240,135);
- gallery.unshift({seed:S.seed,pal:S.pal,url:c.toDataURL('image/jpeg',.8)});gallery=gallery.slice(0,8);renderGal()}
+ gallery.unshift({seed:S.seed,pal:S.pal,sty:S.sty,url:c.toDataURL('image/jpeg',.8)});gallery=gallery.slice(0,8);renderGal()}
 function renderGal(){const g=$('#gal');if(!gallery.length){g.innerHTML='<div class="col-span-full text-sm text-zinc-500 border border-dashed border-white/10 rounded-xl p-6 text-center">Shuffle or save a frame to start your gallery.</div>';return}
- g.innerHTML=gallery.map((x,i)=>`<button data-i="${i}" class="gi rounded-xl overflow-hidden border border-white/10 text-left bg-[#0e0e13] hover:border-lime-300/50"><img src="${x.url}" class="w-full aspect-video object-cover"><div class="px-2 py-1.5 text-[11px] f-m text-zinc-400 flex justify-between"><span>#${x.seed}</span><span>${PAL[x.pal].name}</span></div></button>`).join('');
- g.querySelectorAll('.gi').forEach(b=>b.onclick=()=>{const x=gallery[+b.dataset.i];S.seed=x.seed;S.pal=x.pal;S.bgOv=null;sync();restart()})}
-const rnd=(a,b,s)=>Math.round((a+Math.random()*(b-a))/s)*s;
-function surprise(){snap();S.pal=Math.floor(Math.random()*PAL.length);S.bgOv=null;S.seed=Math.floor(Math.random()*99999);
- for(const[,l]of SL)for(const[k,,mn,mx,st]of l){if(k==='particleCount')S[k]=rnd(1500,4500,st);else if(k==='maxLife')S[k]=rnd(80,200,st);else S[k]=+rnd(mn,mx,st).toFixed(2)}
- S.lineWidth=+rnd(.6,1.8,.1).toFixed(1);S.opacity=+rnd(.3,.8,.05).toFixed(2);sync();restart()}
+ g.innerHTML=gallery.map((x,i)=>`<button data-i="${i}" class="gi rounded-xl overflow-hidden border border-white/10 text-left bg-[#0e0e13] hover:border-lime-300/50"><img src="${x.url}" class="w-full aspect-video object-cover"><div class="px-2 py-1.5 text-[11px] f-m text-zinc-400 flex justify-between gap-2"><span>#${x.seed}</span><span class="truncate">${(STYBY[x.sty]||STY[0]).name}</span></div></button>`).join('');
+ g.querySelectorAll('.gi').forEach(b=>b.onclick=()=>{const x=gallery[+b.dataset.i];S.seed=x.seed;S.pal=x.pal;S.sty=x.sty||S.sty;S.bgOv=null;sync();restart()})}
+
+/* ---------- studio actions ---------- */
+function surprise(){snap();
+ const st=STY[Math.floor(Math.random()*STY.length)];
+ S.sty=st.id;S.pal=Math.floor(Math.random()*PAL.length);S.bgOv=null;S.seed=Math.floor(Math.random()*99999);
+ const pinned=(S.presets&&st.preset)||{};Object.assign(S,pinned);
+ for(const[,l]of SL)for(const[k,,mn,mx,step]of l){if(k in pinned)continue;
+  if(k==='particleCount')S[k]=rnd(1500,4500,step);else S[k]=+rnd(mn,mx,step).toFixed(2)}
+ if(!('lineWidth' in pinned))S.lineWidth=+rnd(.6,1.8,.1).toFixed(1);
+ if(!('opacity' in pinned))S.opacity=+rnd(.3,.8,.05).toFixed(2);
+ sync();restart();toast('Surprise — '+st.name)}
 function randSeed(){S.seed=Math.floor(Math.random()*99999);sync();restart()}
 function fs(){document.fullscreenElement?document.exitFullscreen():$('#stage').requestFullscreen?.()}
-const exp=()=>exportAs(S.fmt);
+function pickStyle(id){const st=STYBY[id];if(!st)return;S.sty=id;if(S.presets&&st.preset)Object.assign(S,st.preset);S.bgOv=null;side();sync();restart()}
+function nextStyle(){const i=STY.findIndex(s=>s.id===S.sty);pickStyle(STY[(i+1)%STY.length].id);toast('Style — '+sty().name)}
+function pickPalette(i){S.pal=i;S.bgOv=null;sync();restart()}
 
 function hud(){
  const st=done()?['COMPLETE','bg-cyan-300',0]:playing?['GROWING','bg-lime-300','animate-pulse']:['PAUSED','bg-zinc-400',0];
  $('#hStat').innerHTML=`<span class="w-2 h-2 rounded-full ${st[1]} ${st[2]}"></span>${st[0]}`;
+ $('#hStyle').textContent=sty().name;
  $('#hSeedPill').textContent='seed #'+S.seed;$('#hSeed').innerHTML=ic('copy')+'#'+S.seed;
+ $('#hBatch').innerHTML=ic('grid')+'<span class="hidden lg:inline">Batch</span>';
  $('#hSurp').innerHTML=ic('spark')+'<span class="hidden sm:inline">Surprise me</span>';
  $('#hExp').innerHTML=ic('dl')+'Export '+S.fmt.toUpperCase();
- const B=(id,i,t,c='')=>`<button id="${id}" class="btn ${c}" title="${t}">${ic(i)}${c?'':''}</button>`;
- $('#hud').innerHTML=`<button id="bPlay" class="btn lime">${ic(playing&&!done()?'pause':'play')}</button><button id="bRe" class="btn" title="Replay from seed">${ic('replay')}</button><button id="bSh" class="btn">${ic('shuffle')}Shuffle</button><button id="bOv" class="btn">${ic('layers')}Overdraw</button><button id="bSv" class="btn" title="Save to gallery">${ic('save')}</button><button id="bFs" class="btn" title="Fullscreen">${ic('max')}</button><span class="flex-1"></span><button id="bPng" class="btn">${ic('dl')}PNG</button><button id="bSvg" class="btn">${ic('dl')}SVG</button>`;
- $('#bPlay').onclick=toggle;$('#bRe').onclick=()=>restart();$('#bSh').onclick=surprise;$('#bOv').onclick=overdraw;$('#bSv').onclick=snap;$('#bFs').onclick=fs;$('#bPng').onclick=()=>exportAs('png');$('#bSvg').onclick=()=>exportAs('svg');
+ $('#hud').innerHTML=`<button id="bPlay" class="btn lime">${ic(playing&&!done()?'pause':'play')}</button><button id="bRe" class="btn" title="Replay from seed">${ic('replay')}</button><button id="bSh" class="btn">${ic('shuffle')}Shuffle</button><button id="bNe" class="btn" title="Next style (N)">${ic('grid')}${sty().name}</button><button id="bOv" class="btn">${ic('layers')}Overdraw</button><button id="bSv" class="btn" title="Save to gallery">${ic('save')}</button><button id="bFs" class="btn" title="Fullscreen">${ic('max')}</button><span class="flex-1"></span><button id="bPng" class="btn">${ic('dl')}PNG</button><button id="bSvg" class="btn">${ic('dl')}SVG</button>`;
+ $('#bPlay').onclick=toggle;$('#bRe').onclick=()=>restart();$('#bSh').onclick=surprise;$('#bNe').onclick=nextStyle;$('#bOv').onclick=overdraw;$('#bSv').onclick=snap;$('#bFs').onclick=fs;$('#bPng').onclick=()=>exportAs('png');$('#bSvg').onclick=()=>exportAs('svg');
  prog()}
 function toggle(){if(done())overdraw();else{playing=!playing;hud()}}
 
+/* ---------- sidebar ---------- */
 function side(){
  const sw=['#08080c','#0f172a','#1c1917','#f4f1ea','#ffffff'];
- let h=`<div><div class="f-d font-semibold text-white mb-2">Palette</div><div id="pg" class="grid grid-cols-6 gap-1.5 mb-3">${PAL.map((p,i)=>`<button data-i="${i}" title="${p.name}" class="pb h-9 rounded-lg overflow-hidden border border-white/10 flex flex-col" style="background:${p.bg}"><span class="flex-1 flex w-full">${p.colors.map(c=>`<i class="flex-1" style="background:${c}"></i>`).join('')}</span></button>`).join('')}</div>
+ let h=`<div><div class="flex items-center justify-between mb-2"><div class="f-d font-semibold text-white">Style</div><div class="f-m text-[10px] text-zinc-500">${sty().name}</div></div>
+ <div id="tfg" class="flex gap-1.5 mb-2.5">${[{id:'all',name:'All'},...TYPES].map(t=>`<button data-t="${t.id}" class="mini flex-1">${t.icon?ic(t.icon,'ic inline-block align-[-3px] mr-1'):''}${t.name}</button>`).join('')}</div>
+ <div id="sgrid" class="grid grid-cols-2 gap-2"></div>
+ <div id="sInfo" class="mt-2.5 rounded-xl p-2.5 border border-white/10 bg-[#0e0e13] text-[11px] text-zinc-400"></div>
+ <label class="mt-2 flex items-center gap-2 text-[11px] text-zinc-400 cursor-pointer"><input id="spreset" type="checkbox" class="accent-lime-300" ${S.presets?'checked':''}> Apply style presets (recommended settings)</label></div>`;
+ h+=`<div><div class="f-d font-semibold text-white mb-2">Palette</div><div id="pg" class="grid grid-cols-6 gap-1.5 mb-3">${PAL.map((p,i)=>`<button data-i="${i}" title="${p.name}" class="pb h-9 rounded-lg overflow-hidden border border-white/10 flex flex-col" style="background:${isLight(p.bg)?p.bg:'#0e0e13'}"><span class="flex-1 flex w-full">${p.colors.map(c=>`<i class="flex-1" style="background:${c}"></i>`).join('')}</span></button>`).join('')}</div>
  <div id="ps" class="rounded-xl p-3 border border-white/10 bg-[#0e0e13] text-sm"></div>
  <div class="mt-3 text-xs text-zinc-400">Canvas background</div><div class="flex items-center gap-1.5 mt-1.5">${sw.map(c=>`<button data-c="${c}" class="bgb w-6 h-6 rounded-full border border-white/20" style="background:${c}"></button>`).join('')}<input id="bgc" type="color" class="w-7 h-7 bg-transparent border-0 p-0 cursor-pointer"><button id="bgr" class="btn" style="padding:3px 8px">Reset</button></div></div>`;
- for(const[t,l]of SL)h+=`<div><div class="f-d font-semibold text-white mb-2">${t}</div><div class="space-y-3">${l.map(([k,lb,mn,mx,st,d,u=''])=>`<div><div class="flex justify-between text-xs mb-1.5"><span class="text-zinc-400">${lb}</span><span id="v_${k}" class="f-m text-lime-200"></span></div><input type="range" data-k="${k}" min="${mn}" max="${mx}" step="${st}"></div>`).join('')}</div></div>`;
+ for(const[t,l]of SL)h+=`<div><div class="f-d font-semibold text-white mb-2">${t}</div><div class="space-y-3">${l.map(([k,lb,mn,mx,step,d,u=''])=>`<div><div class="flex justify-between text-xs mb-1.5"><span class="text-zinc-400">${lb}</span><span id="v_${k}" class="f-m text-lime-200"></span></div><input type="range" data-k="${k}" min="${mn}" max="${mx}" step="${step}"></div>`).join('')}</div></div>`;
  h+=`<div><div class="f-d font-semibold text-white mb-2">Seed</div><div class="flex gap-2"><input id="sd" type="number" class="f-m flex-1 min-w-0 rounded-lg bg-[#0e0e13] border border-white/10 px-3 py-1.5 text-sm text-white"><button id="sg" class="btn lime">Grow</button><button id="sr" class="btn" title="Randomize seed">${ic('dice')}</button></div></div>
- <div><div class="f-d font-semibold text-white mb-2">Export (PNG · SVG)</div><div class="grid grid-cols-2 gap-2 mb-3">${[['png','PNG format','Crisp 4K raster'],['svg','SVG format','Infinite vector paths']].map(([k,a,b])=>`<button data-f="${k}" class="fb text-left rounded-xl border border-white/10 bg-[#0e0e13] p-2.5"><div class="text-sm text-white">${a}</div><div class="text-[11px] text-zinc-500">${b}</div></button>`).join('')}</div>
+ <div><div class="flex items-baseline justify-between mb-2"><div class="f-d font-semibold text-white">Export</div><div class="text-[10px] f-m text-zinc-500">${sty().name}</div></div><div class="grid grid-cols-2 gap-2 mb-3">${[['png','PNG format','Crisp 4K raster'],['svg','SVG format','Infinite vector paths']].map(([k,a,b])=>`<button data-f="${k}" class="fb text-left rounded-xl border border-white/10 bg-[#0e0e13] p-2.5"><div class="text-sm text-white">${a}</div><div class="text-[11px] text-zinc-500">${b}</div></button>`).join('')}</div>
  <div class="grid grid-cols-2 gap-2 mb-3">${Object.entries(RES).map(([k,r])=>`<button data-r="${k}" class="rb text-left rounded-lg border border-white/10 bg-[#0e0e13] p-2"><div class="text-xs text-white">${r[0]}</div><div class="f-m text-[10px] text-zinc-500">${r[1]?r[1]+' × '+r[2]:r[3]}</div></button>`).join('')}</div>
- <button id="dl" class="btn lime w-full justify-center py-2.5"></button><div class="grid grid-cols-2 gap-2 mt-2"><button id="qp" class="btn justify-center">Quick PNG</button><button id="qs" class="btn justify-center">Quick SVG</button></div></div>`;
+ <button id="dl" class="btn lime w-full justify-center py-2.5"></button><div class="grid grid-cols-2 gap-2 mt-2"><button id="qp" class="btn justify-center">Quick PNG</button><button id="qs" class="btn justify-center">Quick SVG</button></div>
+ <button id="bJump" class="btn w-full justify-center mt-2">${ic('grid')}Send to batch studio</button></div>`;
  $('#side').innerHTML=h;
- $('#pg').onclick=e=>{const b=e.target.closest('.pb');if(b){S.pal=+b.dataset.i;S.bgOv=null;sync();restart()}};
+ renderStyles();
+ $('#tfg').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;B.typeFilter=b.dataset.t;renderStyles()};
+ $('#pg').onclick=e=>{const b=e.target.closest('.pb');if(b)pickPalette(+b.dataset.i)};
  document.querySelectorAll('.bgb').forEach(b=>b.onclick=()=>{S.bgOv=b.dataset.c;sync();restart()});
  $('#bgc').oninput=e=>{S.bgOv=e.target.value;sync();debounced()};$('#bgr').onclick=()=>{S.bgOv=null;sync();restart()};
  document.querySelectorAll('input[data-k]').forEach(el=>el.oninput=()=>{S[el.dataset.k]=+el.value;sync(true);debounced()});
+ $('#spreset').onchange=e=>{S.presets=e.target.checked};
  $('#sd').onchange=e=>{S.seed=Math.abs(parseInt(e.target.value)||0);sync();restart()};$('#sg').onclick=()=>{S.seed=Math.abs(parseInt($('#sd').value)||0);sync();restart()};$('#sr').onclick=randSeed;
  document.querySelectorAll('.fb').forEach(b=>b.onclick=()=>{S.fmt=b.dataset.f;sync()});
  document.querySelectorAll('.rb').forEach(b=>b.onclick=()=>{S.res=b.dataset.r;sync()});
- $('#dl').onclick=exp;$('#qp').onclick=()=>exportAs('png');$('#qs').onclick=()=>exportAs('svg')}
+ $('#dl').onclick=exp;$('#qp').onclick=()=>exportAs('png');$('#qs').onclick=()=>exportAs('svg');
+ $('#bJump').onclick=()=>{B.sel=[S.sty];B.typeFilter='all';syncBatch();$('#batch').scrollIntoView?.({behavior:'smooth'})};
+ sync()}
+function renderStyles(){
+ const list=B.typeFilter==='all'?STY:STY.filter(s=>s.type===B.typeFilter);
+ $('#tfg').querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===B.typeFilter));
+ $('#sgrid').innerHTML=list.map(s=>`<button data-s="${s.id}" class="sbtn ${s.id===S.sty?'act':''}" title="${s.blurb}">${ic(s.icon)}<span class="min-w-0"><span class="block text-[11px] leading-tight text-white truncate">${s.name}</span><span class="block text-[9px] tracking-wide uppercase ${s.type==='technology'?'text-cyan-300/80':'text-zinc-500'}">${s.type}</span></span></button>`).join('');
+ $('#sgrid').onclick=e=>{const b=e.target.closest('[data-s]');if(b)pickStyle(b.dataset.s)};
+ const st=sty();
+ $('#sInfo').innerHTML=`<span class="text-zinc-200">${st.name}</span> — ${st.blurb}<br><span class="text-zinc-500">${TYPES.find(t=>t.id===st.type).name} type${st.f.gridOverlay?' · grid':''}${st.f.dots?' · nodes':''}${st.f.glow?' · bloom':''}${st.f.quant?' · '+st.f.quant+'-way snap':''}</span>`}
 
 function sync(light){
  document.querySelectorAll('input[data-k]').forEach(el=>{const k=el.dataset.k,v=S[k];el.value=v;el.style.setProperty('--fill',((v-el.min)/(el.max-el.min)*100)+'%');
   const cfg=SL.flatMap(x=>x[1]).find(c=>c[0]===k);$('#v_'+k).textContent=(+v).toFixed(cfg[5])+(cfg[6]||'')});
  hud();if(light)return;
- const p=pal();document.querySelectorAll('.pb').forEach(b=>b.classList.toggle('sel',+b.dataset.i===S.pal));
- $('#ps').innerHTML=`<div class="flex justify-between"><span class="text-white">${p.name}</span><span class="text-xs text-zinc-500">${p.mood}</span></div><div class="flex gap-1 mt-2">${p.colors.map(c=>`<i class="flex-1 h-3 rounded" style="background:${c}"></i>`).join('')}</div>`;
+ const p=pal();
+ document.querySelectorAll('#pg .pb').forEach(b=>b.classList.toggle('sel',+b.dataset.i===S.pal));
+ document.querySelectorAll('#sgrid .sbtn').forEach(b=>b.classList.toggle('act',b.dataset.s===S.sty));
+ $('#ps').innerHTML=`<div class="flex justify-between gap-2"><span class="text-white">${p.name}</span><span class="text-xs text-zinc-500">${p.mood}</span></div><div class="flex gap-1 mt-2">${p.colors.map(c=>`<i class="flex-1 h-3 rounded" style="background:${c}"></i>`).join('')}</div>`;
  document.querySelectorAll('.bgb').forEach(b=>b.classList.toggle('sel',b.dataset.c===S.bgOv));
  $('#sd').value=S.seed;
  document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.f===S.fmt));
@@ -259,13 +617,169 @@ function sync(light){
  $('#dl').innerHTML=ic('dl')+'Download '+S.fmt.toUpperCase()+' wallpaper';
  $('#strip').querySelectorAll('.sc').forEach(b=>b.classList.toggle('sel',+b.dataset.i===S.pal))}
 
-$('#strip').innerHTML=PAL.map((p,i)=>`<button data-i="${i}" class="sc shrink-0 w-40 rounded-xl overflow-hidden border border-white/10 text-left" style="background:${p.bg}"><div class="flex h-14 gap-1 p-2.5">${p.colors.map(c=>`<i class="flex-1 rounded-sm" style="background:${c}"></i>`).join('')}</div><div class="bg-[#0e0e13] px-3 py-2"><div class="text-sm text-white">${p.name}</div><div class="text-[11px] text-zinc-500">${p.mood}</div></div></button>`).join('');
-$('#strip').onclick=e=>{const b=e.target.closest('.sc');if(b){S.pal=+b.dataset.i;S.bgOv=null;sync();restart()}};
+/* ---------- batch studio ---------- */
+function clearBatchItems(revoke=true){
+ if(revoke)B.urls.forEach(u=>URL.revokeObjectURL(u));B.urls=[];B.items=[];B.sheetBlob=null;renderBatch();syncBatch()}
+function renderBatch(){
+ const g=$('#bGrid');
+ if(!B.items.length){g.innerHTML=`<div class="col-span-full text-sm text-zinc-500 border border-dashed border-white/10 rounded-xl p-8 text-center">Nothing queued yet. Pick styles and hit <b class="text-zinc-300">Generate batch</b> — every frame lands here as a thumbnail with its own PNG/SVG download.</div>`;return}
+ g.innerHTML=B.items.map((it,i)=>`<div class="tile card p-2">
+  <img src="${it.url}" class="w-full rounded-lg border border-white/10 bg-black ${it.pending?'opacity-40':''}" alt="">
+  <div class="mt-1.5 f-m text-[10px] text-zinc-400 flex justify-between gap-1"><span>#${it.seed}</span><span class="truncate text-zinc-300">${it.styleName}</span></div>
+  <div class="text-[9px] f-m text-zinc-500 truncate">${it.paletteName} · ${it.W}×${it.H}${it.state?' · '+it.state:''}</div>
+  <div class="flex gap-1 mt-1.5">
+   <button data-i="${i}" data-a="png" class="btn flex-1 justify-center" style="padding:3px 4px" ${it.png?'':'disabled'}>PNG</button>
+   <button data-i="${i}" data-a="svg" class="btn flex-1 justify-center" style="padding:3px 4px" ${it.svg?'':'disabled'}>SVG</button>
+   <button data-i="${i}" data-a="load" class="btn" style="padding:3px 6px" title="Open this frame in the studio">${ic('load')}</button>
+   <button data-i="${i}" data-a="del" class="btn" style="padding:3px 6px" title="Remove from batch">${ic('x')}</button>
+  </div></div>`).join('');
+ g.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{
+  const it=B.items[+b.dataset.i],a=b.dataset.a;
+  if(a==='png')saveBlob(it.png,it.filePng)
+  else if(a==='svg'&&it.svg)saveBlob(it.svg,it.fileSvg)
+  else if(a==='load'){S.sty=it.style;S.pal=it.pal;S.seed=it.seed;S.bgOv=it.bgOv??null;
+   for(const k of PKEYS)S[k]=it.params[k];
+   side();sync();restart();$('#studio').scrollIntoView?.({behavior:'smooth'});toast('Loaded #'+it.seed+' · '+it.styleName)}
+  else if(a==='del'){B.items.splice(+b.dataset.i,1);renderBatch();syncBatch()}})}
+function syncBatch(){
+ $('#bQty').value=B.count;$('#bQtyV').textContent=B.count;
+ $('#bQty').style.setProperty('--fill',((B.count-2)/(32-2)*100)+'%');
+ $('#bSeq').classList.toggle('on',B.seq);$('#bPal').classList.toggle('on',B.varyPal);
+ $('#bTwk').classList.toggle('on',B.tweak);$('#bSheet').classList.toggle('on',B.sheet);
+ $('#bFmt').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f===B.fmt));
+ $('#bRes').innerHTML=Object.entries(RES).map(([k,r])=>`<option value="${k}" ${k===B.res?'selected':''}>${r[0]}${r[1]?' — '+r[1]+' × '+r[2]:''}${k==='preview'?' (fast)':''}</option>`).join('');
+ $('#bTypes').innerHTML=[{id:'all',name:'All'}].concat(TYPES).map(t=>`<button data-bt="${t.id}" class="mini ${t.id===B.typeFilter?'on':''}">${t.name}</button>`).join('');
+ $('#bTypes').querySelectorAll('[data-bt]').forEach(b=>b.onclick=()=>{B.typeFilter=b.dataset.bt;syncBatch();renderBatchStyles()});
+ renderBatchStyles();
+ const n=B.sel.length;
+ $('#bSelN').textContent=n?`(${n})`:'(none → current)';
+ const sizes={preview:'1280×720 render',hd:'1920×1080',qhd:'2560×1440','4k':'3840×2160',ultrawide:'3440×1440',phone:'1170×2532',square:'2048×2048'};
+ const heavy=B.count>10&&(B.res==='4k'||B.res==='qhd'||B.res==='square');
+ $('#bHint').innerHTML=`Will queue <b class="text-zinc-300">${B.count}</b> × ${sizes[B.res]}${B.fmt==='both'?' in PNG + SVG':B.fmt==='svg'?' as SVG':' as PNG'}${B.seq?` · seeds ${S.seed+1}–${S.seed+B.count}`:' · random seeds'}`
+  +((B.fmt==='svg'||B.fmt==='both')?'<br><span class="text-zinc-500">Vector paths are heavy — the .zip compresses them roughly 6×.</span>':'')
+  +(heavy?'<br><span class="text-amber-300/90">Large size + big count: this can take a few minutes.</span>':'');
+ $('#bRun').innerHTML=B.busy?`${ic('replay','ic spin')}Rendering…`:`${ic('spark')}Generate batch`;
+ $('#bRun').disabled=B.busy;
+ $('#bZip').innerHTML=ic('box')+'Download .zip';$('#bFiles').innerHTML=ic('files')+'Save files';
+ $('#bZip').disabled=B.busy||!B.items.length;$('#bFiles').disabled=B.busy||!B.items.length;$('#bClear').disabled=B.busy||!B.items.length;
+ $('#bStat').textContent=B.busy?`rendering ${B.done||0}/${B.plan.length}`:(B.items.length?`${B.items.length} frames ready`:'idle')}
+function renderBatchStyles(){
+ $('#bStyles').innerHTML=STY.filter(s=>B.typeFilter==='all'||s.type===B.typeFilter).map(s=>`<button data-bs="${s.id}" class="tog ${B.sel.includes(s.id)?'on':''}" title="${s.blurb}"><span class="t">${ic(s.icon,'ic inline-block align-[-3px]')}<span class="truncate">${s.name}</span></span></button>`).join('');
+ $('#bStyles').querySelectorAll('[data-bs]').forEach(b=>b.onclick=()=>{const id=b.dataset.bs;
+  B.sel=B.sel.includes(id)?B.sel.filter(x=>x!==id):B.sel.concat([id]);syncBatch()})}
+function batchStyleList(){const l=STY.filter(s=>B.sel.includes(s.id));return l.length?l:[sty()]}
+const PKEYS=SL.flatMap(x=>x[1]).map(c=>c[0]).concat(['seed']);
+function renderParams(src){const o={};for(const k of PKEYS)o[k]=src[k];return o}
+function batchPlan(){
+ const list=batchStyleList(),rngB=mulberry32((S.seed*7919+B.count*104729+(B.typeFilter||'').length)>>>0),items=[];
+ for(let i=0;i<B.count;i++){
+  const st=list[i%list.length];
+  const seed=B.seq?(S.seed+i+1)%100000:Math.floor(rngB()*99999);
+  const pi=B.varyPal?(B.seq?(S.pal+i)%PAL.length:Math.floor(rngB()*PAL.length)):S.pal;
+  const params=renderParams(S);params.seed=seed;
+  if(B.tweak)for(const[,l]of SL)for(const[k,,mn,mx,step]of l){const base=S[k],lo=Math.max(mn,base*.72),hi=Math.min(mx,base*1.28);
+   params[k]=Math.round((lo+rngB()*(hi-lo))/step)*step}
+  params.seed=seed;
+  items.push({style:st.id,styleName:st.name,pal:pi,paletteName:PAL[pi].name,seed,params,res:B.res,bgOv:S.bgOv,bg:S.bgOv||PAL[pi].bg})}
+ return items}
+function thumbCanvas(canvas,maxW){const k=Math.min(1,maxW/canvas.width),t=document.createElement('canvas');
+ t.width=Math.max(2,Math.round(canvas.width*k));t.height=Math.max(2,Math.round(canvas.height*k));
+ t.getContext('2d').drawImage(canvas,0,0,t.width,t.height);return t}
+async function renderBatchItem(it,onProg){
+ const[W,H]=resDims(it.res),st=STYBY[it.style],pa=PAL[it.pal],bg=it.bg||S.bgOv||pa.bg,p=it.params;
+ const segs=Segs(.35*Math.max(W,H)/1600),sm=makeSim(W,H,p,pa,bg,st),seg=(id,c,w,x1,y1,x2,y2)=>segs.add(id,c,w,x1,y1,x2,y2);
+ const steps=Math.max(12,Math.round(p.maxLife));
+ for(let t=0;t<steps;t++){sm.step(seg);if((t&3)===3){onProg(t/steps);await tick0()}}
+ const c=document.createElement('canvas');c.width=W;c.height=H;const cx=c.getContext('2d'),a=styleAlpha(p,st);
+ paintBase(cx,W,H,st,pa,bg,{seed:p.seed});
+ strokeSegs(cx,segs,pa.colors,{alpha:a,glow:st.f.glow||0,cap:st.f.cap||'round',join:st.f.join||'round'});
+ paintNodes(cx,sm.nodes,pa.colors,bg,st,a);
+ return{c,segs,nodes:sm.nodes,st,pa,bg,W,H,a}}
+async function runBatch(){
+ if(B.busy)return;
+ B.busy=true;B.cancel=false;B.done=0;clearBatchItems(false);B.plan=batchPlan();
+ const items=B.plan.map(it=>({...it,url:'',png:null,svg:null,filePng:'',fileSvg:'',pending:true,W:0,H:0}));
+ items.forEach(it=>{const[W,H]=resDims(it.res);it.W=W;it.H=H;
+  it.filePng=`flowfield-${it.style}-${it.seed}-${W}x${H}.png`;it.fileSvg=`flowfield-${it.style}-${it.seed}-${W}x${H}.svg`});
+ B.items=items;renderBatch();syncBatch();
+ const t0=Date.now();
+ for(let i=0;i<items.length;i++){
+  if(B.cancel)break;
+  const it=items[i];it.state='rendering';
+  const out=await renderBatchItem(it,pr=>{const overall=(i+pr)/items.length*100;
+   $('#bBar').style.width=overall.toFixed(1)+'%';$('#bStat').textContent=`${i+1}/${items.length} · ${it.styleName} #${it.seed} · ${Math.round(pr*100)}%`});
+  if(B.fmt==='png'||B.fmt==='both')it.png=await new Promise(r=>out.c.toBlob(r,'image/png'));
+  if(B.fmt==='svg'||B.fmt==='both')it.svg=new Blob([buildSVG(out.segs,out.nodes,out.W,out.H,out.st,out.pa,out.bg,it.params.opacity,{seed:it.seed})],{type:'image/svg+xml;charset=utf-8'});
+  it.thumb=thumbCanvas(out.c,520);
+  it.url=URL.createObjectURL(await new Promise(r=>it.thumb.toBlob(r,'image/jpeg',.82)));B.urls.push(it.url);
+  it.pending=false;it.state='done';B.done=i+1;
+  renderBatch();syncBatch();
+  await tick0()}
+ if(B.sheet&&B.items.length){B.sheetBlob=await contactSheet()}
+ $('#bBar').style.width='100%';B.busy=false;
+ toast(B.cancel?`Batch stopped — ${B.items.length} frames kept`:`Batch ready — ${B.items.length} frames in ${((Date.now()-t0)/1000).toFixed(1)}s`,3500);
+ renderBatch();syncBatch()}
+async function contactSheet(){
+ const items=B.items.filter(i=>i.thumb);if(!items.length)return null;
+ const cols=Math.min(4,Math.ceil(Math.sqrt(items.length))),rows=Math.ceil(items.length/cols);
+ const tw=items[0].thumb.width,th=items[0].thumb.height,pad=18,label=34,gap=pad;
+ const W=pad*2+cols*tw+(cols-1)*gap,H=pad*2+rows*(th+label)+(rows-1)*gap+46;
+ const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+ x.fillStyle='#08080c';x.fillRect(0,0,W,H);
+ x.fillStyle='#e4e4e7';x.font='600 22px "Space Grotesk",Inter,sans-serif';x.fillText('FLOWFIELD · BATCH CONTACT SHEET',pad,pad+18);
+ x.fillStyle='#71717a';x.font='13px "JetBrains Mono",monospace';
+ x.fillText(`${items.length} frames · ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC · seeds ${items[0].seed}–${items[items.length-1].seed}`,pad,pad+40);
+ for(let i=0;i<items.length;i++){const it=items[i],cx=pad+(i%cols)*(tw+gap),cy=pad+56+Math.floor(i/cols)*(th+label+gap);
+  x.fillStyle='#0e0e13';x.fillRect(cx,cy,tw,th+label);
+  x.drawImage(it.thumb,cx,cy);
+  x.strokeStyle='rgba(255,255,255,.12)';x.strokeRect(cx+.5,cy+.5,tw-1,th+label-1);
+  x.fillStyle='#e4e4e7';x.font='12px "JetBrains Mono",monospace';x.fillText(`${String(i+1).padStart(2,'0')}  #${it.seed}  ${it.styleName}`,cx+8,cy+th+16);
+  x.fillStyle='#71717a';x.fillText(`${it.paletteName} · ${it.W}×${it.H} · ${it.res}`,cx+8,cy+th+30)}
+ return await new Promise(r=>c.toBlob(r,'image/png'))}
+function manifestBlob(){
+ const items=B.items.map(it=>({filePng:B.fmt==='svg'?'':it.filePng,fileSvg:B.fmt==='png'?'':it.fileSvg,style:it.style,styleName:it.styleName,palette:it.paletteName,
+  seed:it.seed,resolution:it.res,width:it.W,height:it.H,background:it.bg,params:it.params}));
+ return new Blob([JSON.stringify({app:'Flowfield Studio v2',generator:'Perlin flow field',exported:new Date().toISOString(),
+  batch:{count:B.items.length,format:B.fmt,sequentialSeeds:B.seq,varyPalettes:B.varyPal,varySettings:B.tweak,styles:bStyleNames()},
+  studio:{style:S.sty,palette:pal().name,...S},
+  frames:items},null,2)],{type:'application/json'})}
+const bStyleNames=()=>batchStyleList().map(s=>s.name);
+async function batchZip(){if(!B.items.length)return;toast('Building ZIP…',12000);
+ const files=[];
+ for(const it of B.items){if(it.png)files.push({name:it.filePng,data:it.png});if(it.svg)files.push({name:it.fileSvg,data:it.svg})}
+ if(B.sheetBlob)files.push({name:'contact-sheet.png',data:B.sheetBlob});
+ files.push({name:'manifest.json',data:manifestBlob()});
+ const zip=await makeZip(files);
+ const name=`flowfield-batch-${B.items.length}-${B.fmt}-${new Date().toISOString().slice(0,10)}.zip`;
+ await saveBlob(zip,name);toast(`ZIP ready — ${files.length} files`,3000)}
+async function batchFiles(){if(!B.items.length)return;
+ const list=[];for(const it of B.items){if(it.png)list.push([it.png,it.filePng]);if(it.svg)list.push([it.svg,it.fileSvg])}
+ list.push([manifestBlob(),'manifest.json']);if(B.sheetBlob)list.push([B.sheetBlob,'contact-sheet.png']);
+ toast(`Saving ${list.length} files — allow multiple downloads`,6000);
+ for(let i=0;i<list.length;i++){await saveBlob(list[i][0],list[i][1]);await new Promise(r=>setTimeout(r,420))}
+ toast('All files saved',2500)}
+function wireBatch(){
+ $('#bQty').oninput=e=>{B.count=+e.target.value;syncBatch()};
+ $('#bSeq').onclick=()=>{B.seq=!B.seq;syncBatch()};
+ $('#bPal').onclick=()=>{B.varyPal=!B.varyPal;syncBatch()};
+ $('#bTwk').onclick=()=>{B.tweak=!B.tweak;syncBatch()};
+ $('#bSheet').onclick=()=>{B.sheet=!B.sheet;syncBatch()};
+ $('#bFmt').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{B.fmt=b.dataset.f;syncBatch()});
+ $('#bRes').onchange=e=>{B.res=e.target.value;syncBatch()};
+ $('#bRun').onclick=runBatch;$('#bZip').onclick=batchZip;$('#bFiles').onclick=batchFiles;
+ $('#bClear').onclick=()=>{clearBatchItems();toast('Batch cleared')};
+ document.querySelectorAll('[data-bq]').forEach(b=>b.onclick=()=>{const q=b.dataset.bq;
+  if(q==='cur')B.sel=[S.sty];else if(q==='all')B.sel=STY.map(s=>s.id);else if(q==='technology')B.sel=stylesOfType('technology').map(s=>s.id);
+  syncBatch();toast(q==='all'?'All styles queued':q==='cur'?'Batch locked to '+sty().name:'Technology styles queued')})}
+
+/* ---------- wiring ---------- */
+$('#strip').innerHTML=PAL.map((p,i)=>`<button data-i="${i}" class="sc shrink-0 w-40 rounded-xl overflow-hidden border border-white/10 text-left" style="background:${isLight(p.bg)?p.bg:'#0e0e13'}"><div class="flex h-14 gap-1 p-2.5">${p.colors.map(c=>`<i class="flex-1 rounded-sm" style="background:${c}"></i>`).join('')}</div><div class="bg-[#0e0e13] px-3 py-2"><div class="text-sm text-white">${p.name}</div><div class="text-[11px] text-zinc-500">${p.mood}</div></div></button>`).join('');
+$('#strip').onclick=e=>{const b=e.target.closest('.sc');if(b)pickPalette(+b.dataset.i)};
 const pills=PAL.map(p=>`<span class="flex items-center gap-2 border border-white/10 rounded-full px-4 py-2 text-sm text-zinc-300 whitespace-nowrap bg-white/5">${p.colors.slice(0,3).map(c=>`<i class="w-2.5 h-2.5 rounded-full" style="background:${c}"></i>`).join('')}${p.name}</span>`).join('');
 $('#mq').innerHTML=pills+pills;
 $('#hSeed').onclick=async()=>{try{await navigator.clipboard.writeText(String(S.seed))}catch(e){}$('#hSeed').innerHTML=ic('check')+'Copied';setTimeout(hud,1200)};
-$('#hSurp').onclick=surprise;$('#hExp').onclick=exp;
-addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName)&&e.target.type!=='range')return;if(e.metaKey||e.ctrlKey)return;
- const k=e.key.toLowerCase();if(e.code==='Space'){e.preventDefault();toggle()}else if(k==='r')surprise();else if(k==='d')exp();else if(k==='s')exportAs('svg')});
-side();renderGal();sync();restart();loop();
+$('#hSurp').onclick=surprise;$('#hExp').onclick=exp;$('#hBatch').onclick=()=>{$('#batch').scrollIntoView?.({behavior:'smooth'});if(!B.items.length)runBatch()};
+addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&e.target.type!=='range')return;if(e.metaKey||e.ctrlKey)return;
+ const k=e.key.toLowerCase();if(e.code==='Space'){e.preventDefault();toggle()}else if(k==='r')surprise();else if(k==='d')exp();else if(k==='s')exportAs('svg');else if(k==='n')nextStyle();else if(k==='b'){if(document.activeElement&&document.activeElement.type==='range')return;runBatch()}});
+side();renderGal();wireBatch();syncBatch();sync();restart();loop();
 </script></body></html>
